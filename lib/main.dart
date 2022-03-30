@@ -22,41 +22,58 @@ class App extends StatelessWidget {
 const digits = 10;
 
 class Ticker extends StatefulWidget {
-  const Ticker({Key? key}) : super(key: key);
+  final int columns;
+  const Ticker({
+    Key? key,
+    this.columns = 3,
+  }) : super(key: key);
 
   @override
   State<Ticker> createState() => _TickerState();
 }
 
 class _TickerState extends State<Ticker> {
-  late FixedExtentScrollController _controller;
+  late List<FixedExtentScrollController> _controllers;
 
   @override
   void initState() {
     super.initState();
 
-    _controller = FixedExtentScrollController();
+    _controllers = List<FixedExtentScrollController>.generate(
+        widget.columns, (_) => FixedExtentScrollController());
   }
 
   @override
   void dispose() {
-    _controller.dispose();
+    for (FixedExtentScrollController controller in _controllers) {
+      controller.dispose();
+    }
 
     super.dispose();
   }
 
   void _scroll(int direction) {
-    if(direction == -1 && _controller.selectedItem == 0) {
-      _controller.jumpToItem(digits);
-    } else if(direction == 1 && _controller.selectedItem == digits) {
-      _controller.jumpToItem(0);
-    }
+    direction *= -1;
 
-    _controller.animateToItem(
-        _controller.selectedItem + 1 * direction,
-        duration: const Duration(milliseconds: 250),
-        curve: Curves.easeInOutSine
-    );
+    int index = _controllers.length;
+
+    do {
+      index -= 1;
+
+      FixedExtentScrollController controller = _controllers[index];
+
+      if (direction == -1 && controller.selectedItem == 0) {
+        controller.jumpToItem(digits);
+      } else if (direction == 1 && controller.selectedItem == digits) {
+        controller.jumpToItem(0);
+      }
+
+      controller.animateToItem(controller.selectedItem + 1 * direction,
+          duration: const Duration(milliseconds: 250),
+          curve: Curves.easeInOutSine);
+    } while (index > 0 &&
+        ((direction == 1 && _controllers[index].selectedItem % digits == 0) ||
+            (direction == -1 && _controllers[index].selectedItem == 1)));
   }
 
   @override
@@ -64,26 +81,32 @@ class _TickerState extends State<Ticker> {
     return Column(
       children: [
         Expanded(
-          child: Center(
-            child: ListWheelScrollView(
-              controller: _controller,
-              physics: const NeverScrollableScrollPhysics(),
-              itemExtent: 200.0,
-              children: List<Widget>.generate(
-                digits + 1,
-                    (index) => FittedBox(
-                  child: Text(
-                    (index % digits).toString(),
-                  ),
-                ),
-              ),
-            ),
+          child: Row(
+            children: _controllers
+                .map((controller) => Expanded(
+                      child: Center(
+                        child: ListWheelScrollView(
+                          controller: controller,
+                          physics: const NeverScrollableScrollPhysics(),
+                          itemExtent: 200.0,
+                          children: List<Widget>.generate(
+                            digits + 1,
+                            (index) => FittedBox(
+                              child: Text(
+                                (index % digits).toString(),
+                              ),
+                            ),
+                          ).reversed.toList(),
+                        ),
+                      ),
+                    ))
+                .toList(),
           ),
         ),
         ConstrainedBox(
-            constraints: const BoxConstraints(
-              maxWidth: 480.0,
-            ),
+          constraints: const BoxConstraints(
+            maxWidth: 480.0,
+          ),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
