@@ -307,3 +307,136 @@ As a matter of preference the application counts numbers by having larger values
     ```
 
 3.  reconsider the condition in the `while` statement since the order of the numbers is flipped
+
+### Initial count
+
+In the moment the application stores the count value locally — perhaps through `shared-preferences` — it is helpful to have the stateful widget receive a value for the initial count.
+
+```dart
+Ticker(count: 109)
+```
+
+Initialize the variable to have the named property optional.
+
+```dart
+class Ticker extends StatefulWidget {
+  final int count;
+  const Ticker({
+    Key? key,
+    this.count = 0
+    // ...
+  }) : super(key: key);
+}
+```
+
+In the subclass of state update the columns through the controllers. Since the logic relies on the `ListWheelScrollView` widgets actually existing include the instructions in the `initState` lifecycle _and_ a function which runs as the widget is built.
+
+```dart
+// initialize controllers
+
+WidgetsBinding.instance?.addPostFrameCallback((_) {
+    // update controllers
+});
+```
+
+Note that the order of the numbers in the lists is reversed, so you need to map the individual digits to the corresponding index.
+
+Once you extract the number for each column in a variable `digit`:
+
+- update the controllers to jump at the bottom of the wheel
+
+  ```dart
+  _controllers[index].jumpToItem(digits);
+  ```
+
+- animate the controllers back to the correct value
+
+  ```dart
+  _controllers[index].animateToItem(
+      digits - digit,
+      // ...
+  )
+  ```
+
+To compute the digit consider the input count and begin with the last column.
+
+```dart
+int count = widget.count;
+int index = _controllers.length - 1;
+```
+
+In a while loop continue extracting the digit as long as 1. the count is a positive number and 2. there are columns left.
+
+```dart
+while(count > 0 && index >= 0) {
+}
+```
+
+Extract the digit with the modulo operator.
+
+```dart
+int digit = count % digits;
+```
+
+Once you update the controller update the count and index to eventually exit the loop.
+
+```dart
+count = count ~/ digits;
+index --;
+```
+
+`~/` works as a shorthand for integer division, `(count / digits).toInt()`.
+
+### Staggered animation
+
+The goal is to stagger the scrolling animation, both for successive columns and for the initial count.
+
+For either start with a value describing the total duration and compute the number of milliseconds devoted to each digit.
+
+For successive columns devote up to 600 milliseconds, in case every digit is flipped.
+
+```dart
+int duration = 600 ~/ _controllers.length;
+```
+
+For the initial count devote up to 2 seconds, since it is ultimately possible to scroll to higher digits and the animation introduces the application.
+
+```dart
+int duration = 2000 ~/ _controllers.length;
+```
+
+Initialize a variable to keep track of the delay and increment this number with each column, with each digit.
+
+```dart
+// successive column
+delay += duration ~/ 3;
+
+// initial count
+delay += duration - (duration ~/ digits);
+```
+
+Consider a smaller amount than the total duration to have successive scrolls take place before the previous instance has had a chance to finish.
+
+Use `Future.delayed` to animate the controller after the prescribed delay.
+
+```dart
+Future.delayed(
+  Duration(milliseconds: delay),,
+  () => // animateToItem
+)
+```
+
+Most importantly, be sure that the delayed animation actually updates the current controller. This means either extracting the index in a separate variable or the controller itself.
+
+```dart
+FixedExtentScrollController controller = _controllers[index];
+
+// later
+controller.animateToItem()
+```
+
+`index` is updated in the while loop so that using the variable would mean the method would be applied on the last available instance.
+
+```diff
+-_controllers[index].animateToItem()
+```

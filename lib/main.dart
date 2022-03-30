@@ -12,7 +12,7 @@ class App extends StatelessWidget {
     return const MaterialApp(
       home: Scaffold(
         body: SafeArea(
-          child: Ticker(),
+          child: Ticker(count: 104),
         ),
       ),
     );
@@ -23,9 +23,11 @@ const digits = 10;
 
 class Ticker extends StatefulWidget {
   final int columns;
+  final int count;
   const Ticker({
     Key? key,
     this.columns = 3,
+    this.count = 0,
   }) : super(key: key);
 
   @override
@@ -41,6 +43,37 @@ class _TickerState extends State<Ticker> {
 
     _controllers = List<FixedExtentScrollController>.generate(
         widget.columns, (_) => FixedExtentScrollController());
+
+    WidgetsBinding.instance?.addPostFrameCallback((_) {
+      int duration = 2000 ~/ _controllers.length;
+      int delay = 250;
+
+      int count = widget.count;
+      int index = _controllers.length - 1;
+      while (count > 0 && index >= 0) {
+        int digit = count % digits;
+
+        if (digit > 0) {
+          FixedExtentScrollController controller = _controllers[index];
+          controller.jumpToItem(digits);
+
+          controller.jumpToItem(digits);
+
+          Future.delayed(
+              Duration(milliseconds: delay),
+              () => controller.animateToItem(
+                    digits - digit,
+                    duration: Duration(milliseconds: duration),
+                    curve: Curves.easeInOutSine,
+                  ));
+
+          delay += duration - (duration ~/ digits);
+        }
+
+        count = count ~/ digits;
+        index--;
+      }
+    });
   }
 
   @override
@@ -55,6 +88,9 @@ class _TickerState extends State<Ticker> {
   void _scroll(int direction) {
     direction *= -1;
 
+    int duration = 600 ~/ _controllers.length;
+    int delay = 0;
+
     int index = _controllers.length;
 
     do {
@@ -68,9 +104,16 @@ class _TickerState extends State<Ticker> {
         controller.jumpToItem(0);
       }
 
-      controller.animateToItem(controller.selectedItem + 1 * direction,
-          duration: const Duration(milliseconds: 250),
-          curve: Curves.easeInOutSine);
+      Future.delayed(
+        Duration(milliseconds: delay),
+        () => controller.animateToItem(
+          controller.selectedItem + 1 * direction,
+          duration: Duration(milliseconds: duration),
+          curve: Curves.easeInOutSine,
+        ),
+      );
+
+      delay += duration ~/ 3;
     } while (index > 0 &&
         ((direction == 1 && _controllers[index].selectedItem % digits == 0) ||
             (direction == -1 && _controllers[index].selectedItem == 1)));
