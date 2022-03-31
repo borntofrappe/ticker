@@ -12,7 +12,7 @@ class App extends StatelessWidget {
     return const MaterialApp(
       home: Scaffold(
         body: SafeArea(
-          child: Ticker(count: 104),
+          child: Ticker(),
         ),
       ),
     );
@@ -121,50 +121,160 @@ class _TickerState extends State<Ticker> {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Expanded(
-          child: Row(
-            children: _controllers
-                .map((controller) => Expanded(
-                      child: Center(
-                        child: ListWheelScrollView(
-                          controller: controller,
-                          physics: const NeverScrollableScrollPhysics(),
-                          itemExtent: 200.0,
-                          children: List<Widget>.generate(
-                            digits + 1,
-                            (index) => FittedBox(
-                              child: Text(
-                                (index % digits).toString(),
+    const double itemExtent = 200.0;
+    const double padding = 8.0;
+    const Color boxStroke = Color(0xff343434);
+    const Color boxFill = Color(0xffefefef);
+    const Color textFill = Color(0xff343434);
+
+    return Center(
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(
+          maxHeight: 520.0,
+        ),
+        child: Column(
+          children: [
+            Expanded(
+              flex: 7,
+              child: Row(
+                children: _controllers
+                    .map(
+                      (controller) => Expanded(
+                        child: Container(
+                          margin: const EdgeInsets.symmetric(horizontal: 12.0),
+                          child: Stack(
+                            children: <Widget>[
+                              Center(
+                                child: ListWheelScrollView(
+                                  overAndUnderCenterOpacity: 0,
+                                  controller: controller,
+                                  physics: const NeverScrollableScrollPhysics(),
+                                  itemExtent: itemExtent,
+                                  children: List<Widget>.generate(
+                                    digits + 1,
+                                    (index) => Container(
+                                      decoration: const BoxDecoration(
+                                        color: boxFill,
+                                      ),
+                                      child: FittedBox(
+                                        fit: BoxFit.cover,
+                                        child: Padding(
+                                          padding:
+                                              const EdgeInsets.all(padding),
+                                          child: Text(
+                                            (index % digits).toString(),
+                                            style: const TextStyle(
+                                              fontFamily: 'Inter',
+                                              fontWeight: FontWeight.w700,
+                                              color: textFill,
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ).reversed.toList(),
+                                ),
                               ),
-                            ),
-                          ).reversed.toList(),
+                              ExcludeSemantics(
+                                child: Center(
+                                  child: ListWheelScrollView(
+                                    itemExtent: itemExtent,
+                                    children: <Widget>[
+                                      Container(
+                                        decoration: BoxDecoration(
+                                          border: Border.all(
+                                            width: 8.0,
+                                            color: boxFill,
+                                          ),
+                                        ),
+                                        child: const FittedBox(
+                                          fit: BoxFit.cover,
+                                          child: Opacity(
+                                            opacity: 0,
+                                            child: Padding(
+                                              padding: EdgeInsets.all(padding),
+                                              child: Text('0'),
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
                       ),
-                    ))
-                .toList(),
-          ),
-        ),
-        ConstrainedBox(
-          constraints: const BoxConstraints(
-            maxWidth: 480.0,
-          ),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              IconButton(
-                onPressed: () => _scroll(-1),
-                icon: const Icon(Icons.remove),
+                    )
+                    .toList(),
               ),
-              IconButton(
-                onPressed: () => _scroll(1),
-                icon: const Icon(Icons.add),
+            ),
+            Expanded(
+              flex: 3,
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(
+                  maxWidth: 480.0,
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    Container(
+                      decoration: BoxDecoration(
+                        color: boxFill,
+                        border: Border.all(
+                          width: 6.0,
+                          color: boxStroke,
+                        ),
+                      ),
+                      child: Material(
+                        child: Ink(
+                          decoration: const ShapeDecoration(
+                            shape: BeveledRectangleBorder(),
+                            color: boxFill,
+                          ),
+                          child: IconButton(
+                            iconSize: 48.0,
+                            onPressed: () => _scroll(-1),
+                            icon: const Icon(
+                              Icons.remove,
+                              color: textFill,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                    Container(
+                      decoration: BoxDecoration(
+                        border: Border.all(
+                          width: 6.0,
+                          color: boxStroke,
+                        ),
+                      ),
+                      child: Material(
+                        child: Ink(
+                          decoration: const ShapeDecoration(
+                            shape: BeveledRectangleBorder(),
+                            color: boxFill,
+                          ),
+                          child: IconButton(
+                            iconSize: 48.0,
+                            onPressed: () => _scroll(1),
+                            icon: const Icon(
+                              Icons.add,
+                              color: textFill,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
               ),
-            ],
-          ),
+            ),
+          ],
         ),
-      ],
+      ),
     );
   }
 }

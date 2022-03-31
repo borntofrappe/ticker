@@ -2,6 +2,40 @@
 
 A trivial counter app.
 
+## TODOS
+
+- [ ] refactor
+
+  - [ ] avoid repeating widgets
+
+  - [ ] initialize variables
+
+- [ ] redesign
+
+  - [ ] consider replacing the icon buttons with text buttons using the `Inter` font
+
+- [ ] scroll
+
+  - [ ] gesture detector
+
+  - [ ] volume keys?
+
+    if so only through a toggle in the settings page, which defaults to disable the feature
+
+- [ ] landscape mode
+
+- [ ] settings page
+
+  - [ ] persist counter
+
+  - [ ] reset counter
+
+  - [ ] jump to a specific number
+
+  - [ ] change the number of digits
+
+  - [ ] (optional) change with volume keys
+
 ## Development notes
 
 > for posterity's sake
@@ -440,3 +474,23 @@ controller.animateToItem()
 ```diff
 -_controllers[index].animateToItem()
 ```
+
+### Design
+
+A few updates following the sketch introducing this project.
+
+![](https://github.com/borntofrappe/ticker/blob/main/ticker.png)
+
+- finally hide the digits above the and below the current one.
+
+- add a border, but only around the digit displayed in the center, by creating a stack and overlaying a decorative list wheel. Wrap the widget in `ExcludeSemantics` to remove the tree from the accessibility tree.
+
+- wrap the buttons in `Material` and `Ink` widgets to change the overall shape
+
+- limit the height of the column to have the wheels and buttons closer
+
+- use `flex` properties to separate the height between wheels and buttons
+
+- add a custom font in place of the default family
+
+- update colors with a more subdued hex color
