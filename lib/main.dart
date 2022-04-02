@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:ticker/routes/home.dart';
+import 'package:ticker/routes/settings.dart';
+import 'package:ticker/widgets/slide_route_transition.dart';
 
 void main() {
   runApp(const App());
@@ -9,12 +12,16 @@ class App extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const MaterialApp(
-      home: Scaffold(
-        body: SafeArea(
-          child: Text('ticker'),
-        ),
-      ),
+    return MaterialApp(
+      home: const Home(),
+      onGenerateRoute: (RouteSettings settings) {
+        if (settings.name == '/settings') {
+          return SlideRouteTransition(child: const Settings());
+        }
+
+        assert(false, '${settings.name} is not implemented');
+        return null;
+      },
     );
   }
 }
