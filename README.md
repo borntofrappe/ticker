@@ -53,3 +53,13 @@ style: OutlinedButton.styleFrom(
   padding: const EdgeInsets.all(0.0),
 )
 ```
+
+### slideToRoute
+
+The application is meant to have two screens, home page and settings. To move to and from the settings' page the goal is to have the visual slide from the right side, explaining the need for a custom page builder.
+
+`slideToRoute` returns an instance of `PageRouteBuilder` for the input widget following the example of [_Animate a page route transition_](https://docs.flutter.dev/cookbook/animation/page-route-animation) from Flutter's own cookbook.
+
+Once you have the function define the transition in the `onGenerateRoute` field of the material application and for the prescribed route.
+
+The builder is used as the application uses `Navigator.pushNamed`.
