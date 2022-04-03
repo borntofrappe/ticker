@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:ticker/widgets/icon_overlap.dart';
+import 'package:ticker/widgets/squared_outlined_button.dart';
 
 class Home extends StatelessWidget {
   const Home({Key? key}) : super(key: key);
@@ -7,26 +7,21 @@ class Home extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        actions: [
-          IconButton(
+      body: SafeArea(
+        child: ListTile(
+          trailing: SquaredOutlinedButton(
+            padding: const EdgeInsets.all(0.0),
             onPressed: () {
               Navigator.pushNamed(context, '/settings');
             },
-            iconSize: 42.0,
-            icon: const IconOverlap(
-              size: 42.0,
-              backgroundIcon: Icons.square_outlined,
-              foregroundIcon: Icons.chevron_right,
-              backgroundColor: Colors.black87,
-              foregroundColor: Colors.black87,
-              foregroundScale: 0.8,
+            size: 32.0,
+            child: Icon(
+              Icons.chevron_right,
+              color: Theme.of(context).primaryColor,
+              size: 32.0,
             ),
-          )
-        ],
-        elevation: 0.0,
-        backgroundColor: Colors.transparent,
-        foregroundColor: Colors.black87,
+          ),
+        ),
       ),
     );
   }

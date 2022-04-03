@@ -46,13 +46,7 @@ child: const Icon(
 ),
 ```
 
-Just change the `fontSize` and `size` properties respectively to have the visuals expand as wanted. Also consider toying with the padding added by default on the outlined button. This directly in the button theme.
-
-```dart
-style: OutlinedButton.styleFrom(
-  padding: const EdgeInsets.all(0.0),
-)
-```
+Just change the `fontSize` and `size` properties respectively to have the visuals expand as wanted.
 
 ### slideToRoute
 
