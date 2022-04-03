@@ -63,3 +63,11 @@ The application is meant to have two screens, home page and settings. To move to
 Once you have the function define the transition in the `onGenerateRoute` field of the material application and for the prescribed route.
 
 The builder is used as the application uses `Navigator.pushNamed`.
+
+### toggle
+
+In the settings page one of the options is to toggle the ability to save the counter as the app is closed and destroyed. To enable this option create `Toggle` as a stateful widget using `SwitchListTile` _or_ `CupertinoSwitch`. The choice between the two is up to the operating system, android and ios respectively.
+
+For android the documentation instructs a widget similar to `ListTile`, with a title, subtitle properties on top of the required `value` and `onChanged` fields.
+
+For ios `CupertinoSwitch` adds only the toggle, not the entire tile. For this reason wrap the widget in a `ListTile`, itself resposible for the horizontal spread.

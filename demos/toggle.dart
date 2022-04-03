@@ -1,9 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 
-// https://codepen.io/borntofrappe/pen/LYeOEJw
 void main() {
-  runApp(const App());
+  runApp(const Home());
+}
+
+class Home extends StatelessWidget {
+  const Home({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      theme: ThemeData(
+        primaryColor: Colors.black87,
+      ),
+      home: const App(),
+    );
+  }
 }
 
 class App extends StatelessWidget {
@@ -11,43 +24,41 @@ class App extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      home: Scaffold(
-        body: SafeArea(
-          child: ListView(
-            children: <Widget>[
-              ListTile(
-                title: Text(
-                  'Reminders'.toUpperCase(),
-                  style: const TextStyle(fontSize: 12.0),
+    return Scaffold(
+      body: SafeArea(
+        child: ListView(
+          children: <Widget>[
+            ListTile(
+              title: Text(
+                'Preferences'.toUpperCase(),
+                style: const TextStyle(fontSize: 12.0),
+              ),
+            ),
+            Toggle(
+              title: const Padding(
+                padding: EdgeInsets.only(bottom: 4.0),
+                child: Text(
+                  'Forget me not',
+                  style: TextStyle(
+                    fontSize: 14.0,
+                    fontWeight: FontWeight.w700,
+                    color: Colors.black87,
+                  ),
                 ),
               ),
-              Toggle(
-                title: const Padding(
-                  padding: EdgeInsets.only(bottom: 2.0),
-                  child: Text(
-                    'High-priority reminders',
-                    style: TextStyle(
-                      fontSize: 14.0,
-                      fontWeight: FontWeight.w700,
-                      color: Colors.black87,
-                    ),
-                  ),
+              subtitle: const Text(
+                'Save your number for the next time.',
+                style: TextStyle(
+                  fontSize: 12.0,
+                  color: Colors.black54,
                 ),
-                subtitle: const Text(
-                  'Play sound even when Silent mode is on.',
-                  style: TextStyle(
-                    fontSize: 12.0,
-                    color: Colors.black54,
-                  ),
-                ),
-                onChanged: (value) {
-                  // here you'd implement the logic connected to the changing vaòue
-                  print(value);
-                },
-              )
-            ],
-          ),
+              ),
+              onChanged: (value) {
+                // here you'd implement the logic connected to the changing value
+                print(value);
+              },
+            )
+          ],
         ),
       ),
     );
@@ -56,14 +67,14 @@ class App extends StatelessWidget {
 
 class Toggle extends StatefulWidget {
   final Widget title;
-  final Widget subtitle;
+  final Widget? subtitle;
   final bool value;
   final Function onChanged;
 
   const Toggle({
     Key? key,
     required this.title,
-    required this.subtitle,
+    this.subtitle,
     this.value = false,
     required this.onChanged,
   }) : super(key: key);
@@ -87,7 +98,7 @@ class _ToggleState extends State<Toggle> {
   @override
   Widget build(BuildContext context) {
     Widget title = widget.title;
-    Widget subtitle = widget.subtitle;
+    Widget? subtitle = widget.subtitle;
     Function onChanged = widget.onChanged;
 
     return Theme.of(context).platform == TargetPlatform.iOS
@@ -100,6 +111,7 @@ class _ToggleState extends State<Toggle> {
                 setState(() => _value = value);
                 onChanged(_value);
               },
+              activeColor: Theme.of(context).primaryColor,
             ),
             onTap: () {
               setState(() => _value = !_value);
@@ -114,6 +126,7 @@ class _ToggleState extends State<Toggle> {
               setState(() => _value = value);
               onChanged(value);
             },
+            activeColor: Theme.of(context).primaryColor,
           );
   }
 }
