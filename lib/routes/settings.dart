@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:ticker/widgets/icon_overlap.dart';
 
 class Settings extends StatelessWidget {
   const Settings({Key? key}) : super(key: key);
@@ -11,18 +12,30 @@ class Settings extends StatelessWidget {
           onPressed: () {
             Navigator.pop(context);
           },
-          icon: const Icon(Icons.chevron_left_rounded),
+          iconSize: 42.0,
+          icon: const IconOverlap(
+            size: 42.0,
+            backgroundIcon: Icons.square_outlined,
+            foregroundIcon: Icons.chevron_left,
+            backgroundColor: Colors.black87,
+            foregroundColor: Colors.black87,
+            foregroundScale: 0.8,
+          ),
         ),
         elevation: 0.0,
         backgroundColor: Colors.transparent,
-        foregroundColor: Colors.black,
+        foregroundColor: Colors.black87,
       ),
       body: ListView(
         children: const <Widget>[
           ListTile(
             title: Text(
               'Ticker',
-              style: TextStyle(fontSize: 26.0, fontFamily: 'Inter'),
+              style: TextStyle(
+                fontSize: 26.0,
+                fontFamily: 'Inter',
+                color: Colors.black87,
+              ),
             ),
           ),
         ],
