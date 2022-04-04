@@ -83,3 +83,11 @@ One way to fix this issue is to consider the available space and computing the v
 As prefaced in the demo devoted to a single wheel the goal is to show a solid border only around the center item. One solution is to have a `Stack` widget with two overlapping wheels. In one wheel add the digits, in the other wheel add a single item to create the outline.
 
 _Please note:_ in the demo the wheel for the border precedes the one dedicated to the numbers, to preserve the scrolling. This means the border is actually behind the digits. In the moment you disable physics scrolling and manage the wheel with a controller it is reasonable to swap the two widgets.
+
+## Additional remarks
+
+- when using the chosen font the squared, outlined button has the unfortunate burden of the family's x-height. To align the characters vertically, specifically the plus and minus sign, it is however possible to benefit from one of the font's features
+
+  1. import `dart:ui`
+
+  2. enable [case sensititive forms](https://api.flutter.dev/flutter/dart-ui/FontFeature/FontFeature.caseSensitiveForms.html)
