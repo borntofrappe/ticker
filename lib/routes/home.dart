@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:ticker/widgets/squared_outlined_button.dart';
 import 'dart:math';
 import 'dart:ui';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class Home extends StatelessWidget {
   const Home({Key? key}) : super(key: key);
@@ -38,6 +39,7 @@ class Home extends StatelessWidget {
 
 class Wheels extends StatefulWidget {
   final int count;
+
   const Wheels({
     Key? key,
     this.count = 3,
@@ -53,12 +55,47 @@ class _WheelsState extends State<Wheels> {
 
   late List<FixedExtentScrollController> _controllers;
 
+  void _optionallyGetValue() async {
+    final instance = await SharedPreferences.getInstance();
+
+    bool hasSharedPreferences = instance.getBool('shared-preferences') ?? false;
+    if (hasSharedPreferences) {
+      int value = instance.getInt('value') ?? 0;
+      if (value > 0) {
+        _scrollTo(value);
+      }
+    }
+  }
+
+  void _optionallyUpdateValue() async {
+    final instance = await SharedPreferences.getInstance();
+
+    bool hasSharedPreferences = instance.getBool('shared-preferences') ?? false;
+    if (hasSharedPreferences) {
+      int value = 0;
+      int index = _controllers.length - 1;
+
+      while (index >= 0) {
+        int digit = (_digits - _controllers[index].selectedItem) % _digits;
+        value += digit * pow(10, _controllers.length - index - 1).toInt();
+
+        index--;
+      }
+
+      instance.setInt('value', value);
+    }
+  }
+
   @override
   void initState() {
     super.initState();
 
     _controllers = List<FixedExtentScrollController>.generate(
         widget.count, (_) => FixedExtentScrollController());
+
+    WidgetsBinding.instance?.addPostFrameCallback((_) {
+      _optionallyGetValue();
+    });
   }
 
   @override
@@ -90,18 +127,63 @@ class _WheelsState extends State<Wheels> {
       }
 
       Future.delayed(
-        Duration(milliseconds: delay),
-        () => controller.animateToItem(
-          controller.selectedItem + 1 * direction,
-          duration: Duration(milliseconds: duration),
-          curve: Curves.easeInOutSine,
+        Duration(
+          milliseconds: delay,
         ),
+        () {
+          controller.animateToItem(
+            controller.selectedItem + 1 * direction,
+            duration: Duration(milliseconds: duration),
+            curve: Curves.easeInOutSine,
+          );
+        },
       );
 
       delay += duration ~/ 3;
     } while (index > 0 &&
         ((direction == 1 && _controllers[index].selectedItem % _digits == 0) ||
             (direction == -1 && _controllers[index].selectedItem == 1)));
+
+    Future.delayed(
+      const Duration(
+        milliseconds: 500,
+      ),
+      () {
+        _optionallyUpdateValue();
+      },
+    );
+  }
+
+  void _scrollTo(int value) {
+    int duration = 2000 ~/ _controllers.length;
+    int delay = 250;
+
+    int index = _controllers.length - 1;
+
+    while (value > 0 && index >= 0) {
+      int digit = value % _digits;
+
+      if (digit > 0) {
+        FixedExtentScrollController controller = _controllers[index];
+        controller.jumpToItem(_digits);
+
+        Future.delayed(
+          Duration(milliseconds: delay),
+          () {
+            controller.animateToItem(
+              _digits - digit,
+              duration: Duration(milliseconds: duration),
+              curve: Curves.easeInOutSine,
+            );
+          },
+        );
+
+        delay += duration - (duration ~/ _digits);
+      }
+
+      value = value ~/ _digits;
+      index--;
+    }
   }
 
   @override

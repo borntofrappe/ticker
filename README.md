@@ -91,3 +91,5 @@ _Please note:_ in the demo the wheel for the border precedes the one dedicated t
   1. import `dart:ui`
 
   2. enable [case sensititive forms](https://api.flutter.dev/flutter/dart-ui/FontFeature/FontFeature.caseSensitiveForms.html)
+
+- in the application it is `settings.dart` which manages the state of the toggle. In light of this it seems reasonable to have the toggle widget be a stateless one
