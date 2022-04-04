@@ -10,11 +10,23 @@ class App extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const MaterialApp(
-      home: Scaffold(
-        body: SafeArea(
-          child: Wheels(),
-        ),
+    return MaterialApp(
+      theme: ThemeData(
+        primaryColor: Colors.black87,
+      ),
+      home: const Home(),
+    );
+  }
+}
+
+class Home extends StatelessWidget {
+  const Home({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return const Scaffold(
+      body: SafeArea(
+        child: Wheels(),
       ),
     );
   }
@@ -56,7 +68,12 @@ class Wheel extends StatelessWidget {
       child: ListWheelScrollView(
         itemExtent: itemExtent,
         children: List<Widget>.generate(
-            10, (index) => Item(digit: index, borderWidth: itemExtent * 0.04)),
+          10,
+          (index) => Item(
+            digit: index,
+            borderWidth: itemExtent * 0.04,
+          ),
+        ),
       ),
     );
   }
@@ -79,9 +96,8 @@ class Item extends StatelessWidget {
         decoration: BoxDecoration(
           border: Border.all(
             width: borderWidth,
-            color: Colors.black87,
+            color: Theme.of(context).primaryColor,
           ),
-          color: Colors.black12,
         ),
         child: FittedBox(
           child: Text('$digit'),
