@@ -3,54 +3,45 @@ import 'package:ticker/widgets/squared_outlined_button.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:math';
 
-class Home extends StatelessWidget {
+class Home extends StatefulWidget {
   const Home({Key? key}) : super(key: key);
 
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      body: SafeArea(
-        child: Column(
-          children: [
-            ListTile(
-              trailing: SquaredOutlinedButton(
-                padding: const EdgeInsets.all(0.0),
-                onPressed: () {
-                  Navigator.pushNamed(context, '/settings');
-                },
-                size: Theme.of(context).iconTheme.size ?? 32.0,
-                child: const Icon(
-                  Icons.chevron_right,
-                ),
-              ),
-            ),
-            const Expanded(
-              child: Wheels(),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
+  State<Home> createState() => _HomeState();
 }
 
-class Wheels extends StatefulWidget {
-  final int count;
-
-  const Wheels({
-    Key? key,
-    this.count = 3,
-  }) : super(key: key);
-
-  @override
-  State<Wheels> createState() => _WheelsState();
-}
-
-class _WheelsState extends State<Wheels> {
+class _HomeState extends State<Home> {
+  static const int _count = 3;
   static const int _digits = 10;
+
   static const double _margin = 8.0;
 
+  static const int _initialDuration = 2000;
+  static const int _initialDelay = 250;
+  static const int _scrollDuration = 125 * _count;
+
   late List<FixedExtentScrollController> _controllers;
+
+  @override
+  void initState() {
+    super.initState();
+
+    _controllers = List<FixedExtentScrollController>.generate(
+        _count, (_) => FixedExtentScrollController());
+
+    WidgetsBinding.instance?.addPostFrameCallback((_) {
+      _optionallyGetValue();
+    });
+  }
+
+  @override
+  void dispose() {
+    for (FixedExtentScrollController controller in _controllers) {
+      controller.dispose();
+    }
+
+    super.dispose();
+  }
 
   void _optionallyGetValue() async {
     final instance = await SharedPreferences.getInstance();
@@ -83,31 +74,41 @@ class _WheelsState extends State<Wheels> {
     }
   }
 
-  @override
-  void initState() {
-    super.initState();
+  void _scrollTo(int value) {
+    int duration = _initialDuration ~/ _controllers.length;
+    int delay = _initialDelay;
 
-    _controllers = List<FixedExtentScrollController>.generate(
-        widget.count, (_) => FixedExtentScrollController());
+    int index = _controllers.length - 1;
 
-    WidgetsBinding.instance?.addPostFrameCallback((_) {
-      _optionallyGetValue();
-    });
-  }
+    while (value > 0 && index >= 0) {
+      int digit = value % _digits;
 
-  @override
-  void dispose() {
-    for (FixedExtentScrollController controller in _controllers) {
-      controller.dispose();
+      if (digit > 0) {
+        FixedExtentScrollController controller = _controllers[index];
+        controller.jumpToItem(_digits);
+
+        Future.delayed(
+          Duration(milliseconds: delay),
+          () {
+            controller.animateToItem(
+              _digits - digit,
+              duration: Duration(milliseconds: duration),
+              curve: Curves.easeInOutQuad,
+            );
+          },
+        );
+
+        delay += duration - (duration ~/ _digits);
+      }
+
+      value = value ~/ _digits;
+      index--;
     }
-
-    super.dispose();
   }
 
   void _scroll(int direction) {
     direction *= -1;
-
-    int duration = 500 ~/ _controllers.length;
+    int duration = _scrollDuration ~/ _controllers.length;
     int delay = 0;
 
     int index = _controllers.length;
@@ -131,7 +132,7 @@ class _WheelsState extends State<Wheels> {
           controller.animateToItem(
             controller.selectedItem + 1 * direction,
             duration: Duration(milliseconds: duration),
-            curve: Curves.easeInOutSine,
+            curve: Curves.decelerate,
           );
         },
       );
@@ -143,7 +144,7 @@ class _WheelsState extends State<Wheels> {
 
     Future.delayed(
       const Duration(
-        milliseconds: 500,
+        milliseconds: _scrollDuration,
       ),
       () {
         _optionallyUpdateValue();
@@ -151,99 +152,86 @@ class _WheelsState extends State<Wheels> {
     );
   }
 
-  void _scrollTo(int value) {
-    int duration = 2000 ~/ _controllers.length;
-    int delay = 250;
-
-    int index = _controllers.length - 1;
-
-    while (value > 0 && index >= 0) {
-      int digit = value % _digits;
-
-      if (digit > 0) {
-        FixedExtentScrollController controller = _controllers[index];
-        controller.jumpToItem(_digits);
-
-        Future.delayed(
-          Duration(milliseconds: delay),
-          () {
-            controller.animateToItem(
-              _digits - digit,
-              duration: Duration(milliseconds: duration),
-              curve: Curves.easeInOutSine,
-            );
-          },
-        );
-
-        delay += duration - (duration ~/ _digits);
-      }
-
-      value = value ~/ _digits;
-      index--;
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     double width = MediaQuery.of(context).size.width;
-    double itemExtent =
-        min(200.0, (width - 2 * _margin * widget.count) / widget.count);
+    double itemExtent = min(200.0, (width - 2 * _margin * _count) / _count);
 
-    return Column(
-      children: [
-        Expanded(
-          flex: 3,
-          child: Row(
-            children: _controllers
-                .map(
-                  (controller) => Expanded(
-                    child: Container(
-                      margin: const EdgeInsets.symmetric(horizontal: _margin),
-                      child: Wheel(
-                        controller: controller,
-                        count: _digits,
-                        itemExtent: itemExtent,
+    return Scaffold(
+      body: SafeArea(
+        child: Column(
+          children: [
+            ListTile(
+              trailing: SquaredOutlinedButton(
+                padding: const EdgeInsets.all(0.0),
+                onPressed: () {
+                  // TODO pass count to optionally save
+                  Navigator.pushNamed(context, '/settings');
+                },
+                size: Theme.of(context).iconTheme.size ?? 32.0,
+                child: const Icon(
+                  Icons.chevron_right,
+                ),
+              ),
+            ),
+            Expanded(
+              flex: 3,
+              child: Row(
+                children: _controllers
+                    .map(
+                      (controller) => Expanded(
+                        child: Container(
+                          margin:
+                              const EdgeInsets.symmetric(horizontal: _margin),
+                          child: Wheel(
+                            controller: controller,
+                            count: _digits,
+                            itemExtent: itemExtent,
+                          ),
+                        ),
                       ),
+                    )
+                    .toList(),
+              ),
+            ),
+            Expanded(
+              flex: 2,
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(
+                  maxWidth: 480.0,
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: <Widget>[
+                    SquaredOutlinedButton(
+                      size:
+                          Theme.of(context).textTheme.button?.fontSize ?? 64.0,
+                      child: Text(
+                        '-',
+                        style: Theme.of(context).textTheme.button,
+                      ),
+                      onPressed: () {
+                        _scroll(-1);
+                      },
                     ),
-                  ),
-                )
-                .toList(),
-          ),
-        ),
-        Expanded(
-          flex: 2,
-          child: ConstrainedBox(
-            constraints: const BoxConstraints(
-              maxWidth: 480.0,
-            ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: <Widget>[
-                SquaredOutlinedButton(
-                  size: Theme.of(context).textTheme.button?.fontSize ?? 64.0,
-                  child: Text(
-                    '-',
-                    style: Theme.of(context).textTheme.button,
-                  ),
-                  onPressed: () {
-                    _scroll(-1);
-                  },
+                    SquaredOutlinedButton(
+                      size:
+                          Theme.of(context).textTheme.button?.fontSize ?? 64.0,
+                      child: Text(
+                        '+',
+                        style: Theme.of(context).textTheme.button,
+                      ),
+                      onPressed: () {
+                        _scroll(1);
+                      },
+                    ),
+                  ],
                 ),
-                SquaredOutlinedButton(
-                  size: Theme.of(context).textTheme.button?.fontSize ?? 64.0,
-                  child: Text(
-                    '+',
-                    style: Theme.of(context).textTheme.button,
-                  ),
-                  onPressed: () {
-                    _scroll(1);
-                  },
-                ),
-              ],
+              ),
             ),
-          ),
+          ],
         ),
-      ],
+      ),
     );
   }
 }

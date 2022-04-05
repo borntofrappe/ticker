@@ -43,25 +43,3 @@ class Toggle extends StatelessWidget {
           );
   }
 }
-
-// class Toggle extends StatefulWidget {
-//   final Widget title;
-//   final Widget? subtitle;
-//   final bool value;
-//   final Function onChanged;
-
-//   const Toggle({
-//     Key? key,
-//     required this.title,
-//     this.subtitle,
-//     this.value = false,
-//     required this.onChanged,
-//   }) : super(key: key);
-
-//   @override
-//   State<Toggle> createState() => _ToggleState();
-// }
-
-// class _ToggleState extends State<Toggle> {
-  
-// }

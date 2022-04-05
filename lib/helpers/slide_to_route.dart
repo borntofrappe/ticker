@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
 
 PageRouteBuilder<dynamic> slideToRoute(Widget child) {
+  const int duration = 500;
   return PageRouteBuilder(
     pageBuilder: (BuildContext context, Animation animation,
             Animation secondaryAnimation) =>
         child,
     transitionDuration: const Duration(
-      milliseconds: 500,
+      milliseconds: duration,
     ),
     transitionsBuilder: (BuildContext context, Animation animation,
         Animation secondaryAnimation, Widget child) {

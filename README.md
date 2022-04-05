@@ -84,12 +84,187 @@ As prefaced in the demo devoted to a single wheel the goal is to show a solid bo
 
 _Please note:_ in the demo the wheel for the border precedes the one dedicated to the numbers, to preserve the scrolling. This means the border is actually behind the digits. In the moment you disable physics scrolling and manage the wheel with a controller it is reasonable to swap the two widgets.
 
-## Additional remarks
+## App
 
-- when using the chosen font the squared, outlined button has the unfortunate burden of the family's x-height. To align the characters vertically, specifically the plus and minus sign, it is however possible to benefit from one of the font's features
+### Infinite scroll
 
-  1. import `dart:ui`
+Connected to the list wheel widget you find `ListWheelScrollView.useDelegate` to generate the children programmatically. In the required `childDelegate` field you can use the `ListWheelChildLoopingListDelegate` widget to create an closed wheel, or rather a repeating wheel with the input digits.
 
-  2. enable [case sensititive forms](https://api.flutter.dev/flutter/dart-ui/FontFeature/FontFeature.caseSensitiveForms.html)
+```dart
+ListWheelScrollView.useDelegate(
+  childDelegate: ListWheelChildLoopingListDelegate(
+    children: [] // List<Widget>...
+  )
+)
+```
 
-- in the application it is `settings.dart` which manages the state of the toggle. In light of this it seems reasonable to have the toggle widget be a stateless one
+Ultimately, however, I chose not to pursue the looping route. This is more as a matter of preference in terms of the values assumed by the controller in `_controller.selectedItem`, which I'd rather keep in a given range instead of extending to large positive _or_ negative numbers.
+
+Keeping the existing `ListWheelScrollView` widget create a list with one more number than necessary.
+
+```diff
+ List<Widget>.generate(digits, )
++List<Widget>.generate(digits + 1,)
+```
+
+Remove the excess in the text widget.
+
+```dart
+Text(
+  (index % digits).toString()
+)
+```
+
+In the scrolling function directly update the current item in the two instances when the selected item falls outside of the list.
+
+The illusion works since you jump to the item before you animate the wheel and ultimately hide all numbers except the one displayed in the center.
+
+### Scroll order
+
+As a matter of preference the application counts numbers by having larger values above smaller ones. One way to achieve the feat is to:
+
+1.  reverse the list of widget describing the numbers
+
+    ```dart
+    List<Widget>.generate(
+      // digits + 1, ...
+    ).reversed.toList()
+    ```
+
+2.  flip the input direction in the `_scroll` function
+
+    ```dart
+    void _scroll(int direction) {
+      direction *= -1;
+    }
+    ```
+
+3.  reconsider the condition in the `while` statement since the order of the numbers is flipped
+
+### Initial count
+
+In the moment the application stores the count value locally it is helpful to have the stateful update the controllers on the basis of a counter variable.
+
+Since the logic relies on the `ListWheelScrollView` widgets actually existing include the instructions in the `initState` lifecycle _and_ a function which runs as the widget is built.
+
+```dart
+// initialize controllers
+
+WidgetsBinding.instance?.addPostFrameCallback((_) {
+    // update controllers
+});
+```
+
+Note that the order of the numbers in the lists is reversed, so you need to map the individual digits to the corresponding index.
+
+Once you extract the number for each column in a variable `digit`:
+
+- update the controllers to jump at the bottom of the wheel
+
+  ```dart
+  _controllers[index].jumpToItem(digits);
+  ```
+
+- animate the controllers back to the correct value
+
+  ```dart
+  _controllers[index].animateToItem(
+      digits - digit,
+      // ...
+  )
+  ```
+
+To compute the digit consider the input count and begin with the last column.
+
+```dart
+int value = widget.value;
+int index = _controllers.length - 1;
+```
+
+In a while loop continue extracting the digit as long as 1. the count is a positive number and 2. there are columns left.
+
+```dart
+while(value > 0 && index >= 0) {
+}
+```
+
+Extract the digit with the modulo operator.
+
+```dart
+int digit = value % digits;
+```
+
+Once you update the controller update the count and index to eventually exit the loop.
+
+```dart
+value = value ~/ digits;
+index --;
+```
+
+`~/` works as a shorthand for integer division, `(count / digits).toInt()`.
+
+### Staggered animation
+
+The goal is to stagger the scrolling animation, both for successive columns and for the initial count.
+
+For either start with a value describing the total duration and compute the number of milliseconds devoted to each digit.
+
+For successive columns devote up to 600 milliseconds, in case every digit is flipped.
+
+```dart
+int duration = 600 ~/ _controllers.length;
+```
+
+For the initial count devote up to 2 seconds, since it is ultimately possible to scroll to higher digits and the animation introduces the application.
+
+```dart
+int duration = 2000 ~/ _controllers.length;
+```
+
+Initialize a variable to keep track of the delay and increment this number with each column, with each digit.
+
+```dart
+// successive column
+delay += duration ~/ 3;
+
+// initial count
+delay += duration - (duration ~/ digits);
+```
+
+Consider a smaller amount than the total duration to have successive scrolls take place before the previous instance has had a chance to finish.
+
+Use `Future.delayed` to animate the controller after the prescribed delay.
+
+```dart
+Future.delayed(
+  Duration(milliseconds: delay),,
+  () => // animateToItem
+)
+```
+
+Most importantly, be sure that the delayed animation actually updates the current controller. This means either extracting the index in a separate variable or the controller itself.
+
+```dart
+FixedExtentScrollController controller = _controllers[index];
+
+// later
+controller.animateToItem()
+```
+
+`index` is updated in the while loop so that using the variable would mean the method would be applied on the last available instance.
+
+```diff
+-_controllers[index].animateToItem()
+```
+
+### Font features
+
+When using the chosen font the squared, outlined button has the unfortunate burden of the family's x-height. To align the characters vertically, specifically the plus and minus sign, it is however possible to benefit from one of the font's features
+
+1. import `dart:ui`
+
+2. enable [case sensititive forms](https://api.flutter.dev/flutter/dart-ui/FontFeature/FontFeature.caseSensitiveForms.html)
+
+### Toggle
+
+In the application it is `settings.dart` which manages the state of the toggle. In light of this it seems reasonable to have the toggle widget be a stateless one.
