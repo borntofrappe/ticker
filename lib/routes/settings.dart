@@ -45,68 +45,55 @@ class _SettingsState extends State<Settings> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: SafeArea(
-        child: ListView(
-          children: <Widget>[
+        child: Column(
+          children: [
             ListTile(
               leading: SquaredOutlinedButton(
                 padding: const EdgeInsets.all(0.0),
                 onPressed: () {
                   Navigator.pop(context);
                 },
-                size: 32.0,
-                child: Icon(
+                size: Theme.of(context).iconTheme.size ?? 32.0,
+                child: const Icon(
                   Icons.chevron_left,
-                  color: Theme.of(context).primaryColor,
-                  size: 32.0,
                 ),
               ),
             ),
-            ListTile(
-              title: Text(
-                'Ticker',
-                style: TextStyle(
-                  fontSize: 26.0,
-                  fontFamily: 'Inter',
-                  color: Theme.of(context).primaryColor,
-                ),
-              ),
-            ),
-            ListTile(
-              dense: true,
-              title: Text(
-                'Preferences'.toUpperCase(),
-                style: TextStyle(
-                  fontSize: 12.0,
-                  fontFamily: 'Inter',
-                  color: Theme.of(context).primaryColor,
-                ),
-              ),
-            ),
-            Toggle(
-              title: Padding(
-                padding: const EdgeInsets.only(bottom: 4.0),
-                child: Text(
-                  'Forget me not',
-                  style: TextStyle(
-                    fontSize: 14.0,
-                    fontWeight: FontWeight.w700,
-                    fontFamily: 'Inter',
-                    color: Theme.of(context).primaryColor,
+            Expanded(
+              child: ListView(
+                children: <Widget>[
+                  ListTile(
+                    title: Text(
+                      'Ticker',
+                      style: Theme.of(context).textTheme.headline1,
+                    ),
                   ),
-                ),
+                  ListTile(
+                    dense: true,
+                    title: Text(
+                      'Preferences'.toUpperCase(),
+                      style: Theme.of(context).textTheme.headline2,
+                    ),
+                  ),
+                  Toggle(
+                    title: Padding(
+                      padding: const EdgeInsets.only(bottom: 4.0),
+                      child: Text(
+                        'Forget me not',
+                        style: Theme.of(context).textTheme.headline3,
+                      ),
+                    ),
+                    subtitle: Text(
+                      'Save your number for the next time.',
+                      style: Theme.of(context).textTheme.subtitle1,
+                    ),
+                    onChanged: (bool value) {
+                      _updateSharedPreferences(value);
+                    },
+                    value: _hasSharedPreferences,
+                  ),
+                ],
               ),
-              subtitle: Text(
-                'Save your number for the next time.',
-                style: TextStyle(
-                  fontSize: 12.0,
-                  fontFamily: 'Inter',
-                  color: Theme.of(context).primaryColor,
-                ),
-              ),
-              onChanged: (bool value) {
-                _updateSharedPreferences(value);
-              },
-              value: _hasSharedPreferences,
             ),
           ],
         ),

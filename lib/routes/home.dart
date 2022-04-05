@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:ticker/widgets/squared_outlined_button.dart';
-import 'dart:math';
-import 'dart:ui';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'dart:math';
 
 class Home extends StatelessWidget {
   const Home({Key? key}) : super(key: key);
@@ -19,11 +18,9 @@ class Home extends StatelessWidget {
                 onPressed: () {
                   Navigator.pushNamed(context, '/settings');
                 },
-                size: 32.0,
-                child: Icon(
+                size: Theme.of(context).iconTheme.size ?? 32.0,
+                child: const Icon(
                   Icons.chevron_right,
-                  color: Theme.of(context).primaryColor,
-                  size: 32.0,
                 ),
               ),
             ),
@@ -223,36 +220,20 @@ class _WheelsState extends State<Wheels> {
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: <Widget>[
                 SquaredOutlinedButton(
-                  size: 64.0,
+                  size: Theme.of(context).textTheme.button?.fontSize ?? 64.0,
                   child: Text(
                     '-',
-                    style: TextStyle(
-                      color: Theme.of(context).primaryColor,
-                      fontSize: 64.0,
-                      fontWeight: FontWeight.w700,
-                      fontFamily: 'Inter',
-                      fontFeatures: const [
-                        FontFeature.caseSensitiveForms(),
-                      ],
-                    ),
+                    style: Theme.of(context).textTheme.button,
                   ),
                   onPressed: () {
                     _scroll(-1);
                   },
                 ),
                 SquaredOutlinedButton(
-                  size: 64.0,
+                  size: Theme.of(context).textTheme.button?.fontSize ?? 64.0,
                   child: Text(
                     '+',
-                    style: TextStyle(
-                      color: Theme.of(context).primaryColor,
-                      fontSize: 64.0,
-                      fontWeight: FontWeight.w700,
-                      fontFamily: 'Inter',
-                      fontFeatures: const [
-                        FontFeature.caseSensitiveForms(),
-                      ],
-                    ),
+                    style: Theme.of(context).textTheme.button,
                   ),
                   onPressed: () {
                     _scroll(1);
@@ -336,9 +317,8 @@ class Item extends StatelessWidget {
               ? Text(
                   '$digit',
                   style: TextStyle(
-                    color: Theme.of(context).primaryColor,
                     fontWeight: FontWeight.w700,
-                    fontFamily: 'Inter',
+                    color: Theme.of(context).primaryColor,
                   ),
                 )
               : null,
