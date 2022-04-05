@@ -4,7 +4,11 @@ import 'package:ticker/widgets/toggle.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class Settings extends StatefulWidget {
-  const Settings({Key? key}) : super(key: key);
+  final int value;
+  const Settings({
+    Key? key,
+    this.value = 0,
+  }) : super(key: key);
 
   @override
   State<Settings> createState() => _SettingsState();
@@ -26,10 +30,13 @@ class _SettingsState extends State<Settings> {
 
     setState(() {
       _hasSharedPreferences = isToggleTrue;
-      instance.setBool('shared-preferences', _hasSharedPreferences);
     });
 
-    if (!_hasSharedPreferences && instance.get('value') != null) {
+    instance.setBool('shared-preferences', _hasSharedPreferences);
+
+    if (_hasSharedPreferences) {
+      instance.setInt('value', widget.value);
+    } else if (instance.containsKey('value')) {
       instance.remove('value');
     }
   }

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:ticker/routes/home.dart';
 import 'package:ticker/routes/settings.dart';
 import 'package:ticker/helpers/slide_to_route.dart';
+import 'package:ticker/helpers/screen_arguments.dart';
 import 'dart:ui';
 
 void main() {
@@ -46,7 +47,12 @@ class App extends StatelessWidget {
       home: const Home(),
       onGenerateRoute: (RouteSettings settings) {
         if (settings.name == '/settings') {
-          return slideToRoute(const Settings());
+          final args = settings.arguments as ScreenArguments;
+          return slideToRoute(
+            Settings(
+              value: args.value,
+            ),
+          );
         }
 
         assert(false, '${settings.name} is not implemented');

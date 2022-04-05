@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:ticker/widgets/squared_outlined_button.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:math';
+import 'package:ticker/helpers/screen_arguments.dart';
 
 class Home extends StatefulWidget {
   const Home({Key? key}) : super(key: key);
@@ -43,6 +44,19 @@ class _HomeState extends State<Home> {
     super.dispose();
   }
 
+  int _computeValue() {
+    int value = 0;
+    int index = _controllers.length - 1;
+
+    while (index >= 0) {
+      int digit = (_digits - _controllers[index].selectedItem) % _digits;
+      value += digit * pow(10, _controllers.length - index - 1).toInt();
+
+      index--;
+    }
+    return value;
+  }
+
   void _optionallyGetValue() async {
     final instance = await SharedPreferences.getInstance();
 
@@ -60,17 +74,7 @@ class _HomeState extends State<Home> {
 
     bool hasSharedPreferences = instance.getBool('shared-preferences') ?? false;
     if (hasSharedPreferences) {
-      int value = 0;
-      int index = _controllers.length - 1;
-
-      while (index >= 0) {
-        int digit = (_digits - _controllers[index].selectedItem) % _digits;
-        value += digit * pow(10, _controllers.length - index - 1).toInt();
-
-        index--;
-      }
-
-      instance.setInt('value', value);
+      instance.setInt('value', _computeValue());
     }
   }
 
@@ -165,8 +169,13 @@ class _HomeState extends State<Home> {
               trailing: SquaredOutlinedButton(
                 padding: const EdgeInsets.all(0.0),
                 onPressed: () {
-                  // TODO pass count to optionally save
-                  Navigator.pushNamed(context, '/settings');
+                  Navigator.pushNamed(
+                    context,
+                    '/settings',
+                    arguments: ScreenArguments(
+                      value: _computeValue(),
+                    ),
+                  );
                 },
                 size: Theme.of(context).iconTheme.size ?? 32.0,
                 child: const Icon(
