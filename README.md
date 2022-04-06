@@ -268,3 +268,5 @@ When using the chosen font the squared, outlined button has the unfortunate burd
 ### Toggle
 
 In the application it is `settings.dart` which manages the state of the toggle. In light of this it seems reasonable to have the toggle widget be a stateless one.
+
+In terms of UI, accompany the toggle with a snackbar. The visual is helpful to notify the user of how the preference has been changed with immediate effect.

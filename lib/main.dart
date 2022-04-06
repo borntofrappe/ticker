@@ -50,6 +50,7 @@ class App extends StatelessWidget {
           final args = settings.arguments as ScreenArguments;
           return slideToRoute(
             Settings(
+              count: args.count,
               value: args.value,
             ),
           );

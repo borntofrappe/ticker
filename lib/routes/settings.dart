@@ -4,10 +4,12 @@ import 'package:ticker/widgets/toggle.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class Settings extends StatefulWidget {
+  final int count;
   final int value;
   const Settings({
     Key? key,
-    this.value = 0,
+    required this.count,
+    required this.value,
   }) : super(key: key);
 
   @override
@@ -25,7 +27,7 @@ class _SettingsState extends State<Settings> {
     });
   }
 
-  void _updateSharedPreferences(bool isToggleTrue) async {
+  void _updateSharedPreferences(bool isToggleTrue, BuildContext context) async {
     final instance = await SharedPreferences.getInstance();
 
     setState(() {
@@ -35,9 +37,24 @@ class _SettingsState extends State<Settings> {
     instance.setBool('shared-preferences', _hasSharedPreferences);
 
     if (_hasSharedPreferences) {
-      instance.setInt('value', widget.value);
+      final bool success = await instance.setInt('value', widget.value);
+      if (success) {
+        ScaffoldMessenger.of(context).hideCurrentSnackBar();
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+          content: Text('Gotcha, your number is safe and sound.'),
+          duration: Duration(seconds: 3),
+        ));
+      }
     } else if (instance.containsKey('value')) {
-      instance.remove('value');
+      final bool success = await instance.remove('value');
+      if (success) {
+        ScaffoldMessenger.of(context).hideCurrentSnackBar();
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: Text(
+              'Understood, next time we start from ${' zero' * widget.count}.'),
+          duration: const Duration(seconds: 3),
+        ));
+      }
     }
   }
 
@@ -95,7 +112,7 @@ class _SettingsState extends State<Settings> {
                       style: Theme.of(context).textTheme.subtitle1,
                     ),
                     onChanged: (bool value) {
-                      _updateSharedPreferences(value);
+                      _updateSharedPreferences(value, context);
                     },
                     value: _hasSharedPreferences,
                   ),

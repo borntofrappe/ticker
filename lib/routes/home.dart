@@ -173,6 +173,7 @@ class _HomeState extends State<Home> {
                     context,
                     '/settings',
                     arguments: ScreenArguments(
+                      count: _count,
                       value: _computeValue(),
                     ),
                   );

@@ -1,7 +1,9 @@
 class ScreenArguments {
+  final int count;
   final int value;
 
   ScreenArguments({
-    this.value = 0,
+    required this.count,
+    required this.value,
   });
 }
