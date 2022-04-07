@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:ticker/routes/splash_screen.dart';
 import 'package:ticker/routes/home.dart';
 import 'package:ticker/routes/settings.dart';
 import 'package:ticker/helpers/slide_to_route.dart';
@@ -44,9 +45,14 @@ class App extends StatelessWidget {
           bodyColor: Colors.black87,
         ),
       ),
-      home: const Home(),
+      home: const SplashScreen(text: 'Ticker'),
       onGenerateRoute: (RouteSettings settings) {
-        if (settings.name == '/settings') {
+        if (settings.name == '/home') {
+          return slideToRoute(
+            const Home(),
+            const Duration(milliseconds: 1000),
+          );
+        } else if (settings.name == '/settings') {
           final args = settings.arguments as ScreenArguments;
           return slideToRoute(
             Settings(
