@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 class SquaredOutlinedButton extends StatelessWidget {
   final double size;
+  final double borderWidth;
   final Widget child;
   final void Function() onPressed;
   final EdgeInsetsGeometry? padding;
@@ -9,6 +10,7 @@ class SquaredOutlinedButton extends StatelessWidget {
   const SquaredOutlinedButton({
     Key? key,
     required this.size,
+    required this.borderWidth,
     required this.child,
     required this.onPressed,
     this.padding,
@@ -19,22 +21,19 @@ class SquaredOutlinedButton extends StatelessWidget {
     return SizedBox(
       width: size,
       height: size,
-      child: AspectRatio(
-        aspectRatio: 1.0,
-        child: OutlinedButton(
-          style: OutlinedButton.styleFrom(
-            padding: padding,
-            primary: Theme.of(context).primaryColor,
-            shape: const BeveledRectangleBorder(),
-            side: BorderSide(
-              color: Theme.of(context).primaryColor,
-              width: size * 0.04,
-            ),
+      child: OutlinedButton(
+        style: OutlinedButton.styleFrom(
+          padding: padding,
+          primary: Theme.of(context).primaryColor,
+          shape: const BeveledRectangleBorder(),
+          side: BorderSide(
+            color: Theme.of(context).primaryColor,
+            width: borderWidth,
           ),
-          onPressed: onPressed,
-          child: FittedBox(
-            child: child,
-          ),
+        ),
+        onPressed: onPressed,
+        child: FittedBox(
+          child: child,
         ),
       ),
     );

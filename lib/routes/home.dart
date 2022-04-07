@@ -160,6 +160,8 @@ class _HomeState extends State<Home> {
   Widget build(BuildContext context) {
     double width = MediaQuery.of(context).size.width;
     double itemExtent = min(200.0, (width - 2 * _margin * _count) / _count);
+    double borderWidth = itemExtent * 0.04;
+    double iconSize = Theme.of(context).iconTheme.size ?? 32.0;
 
     return Scaffold(
       body: SafeArea(
@@ -178,7 +180,8 @@ class _HomeState extends State<Home> {
                     ),
                   );
                 },
-                size: Theme.of(context).iconTheme.size ?? 32.0,
+                size: iconSize,
+                borderWidth: iconSize * 0.04,
                 child: const Icon(
                   Icons.chevron_right,
                 ),
@@ -197,6 +200,7 @@ class _HomeState extends State<Home> {
                             controller: controller,
                             count: _digits,
                             itemExtent: itemExtent,
+                            borderWidth: borderWidth,
                           ),
                         ),
                       ),
@@ -216,6 +220,7 @@ class _HomeState extends State<Home> {
                     SquaredOutlinedButton(
                       size:
                           Theme.of(context).textTheme.button?.fontSize ?? 64.0,
+                      borderWidth: borderWidth / 2,
                       child: Text(
                         '-',
                         style: Theme.of(context).textTheme.button,
@@ -227,6 +232,7 @@ class _HomeState extends State<Home> {
                     SquaredOutlinedButton(
                       size:
                           Theme.of(context).textTheme.button?.fontSize ?? 64.0,
+                      borderWidth: borderWidth / 2,
                       child: Text(
                         '+',
                         style: Theme.of(context).textTheme.button,
@@ -249,12 +255,14 @@ class _HomeState extends State<Home> {
 class Wheel extends StatelessWidget {
   final int count;
   final double itemExtent;
+  final double borderWidth;
   final FixedExtentScrollController controller;
 
   const Wheel({
     Key? key,
     required this.count,
     required this.itemExtent,
+    required this.borderWidth,
     required this.controller,
   }) : super(key: key);
 
@@ -278,7 +286,7 @@ class Wheel extends StatelessWidget {
             itemExtent: itemExtent,
             children: <Widget>[
               Item(
-                borderWidth: itemExtent * 0.04,
+                borderWidth: borderWidth,
               ),
             ],
           ),

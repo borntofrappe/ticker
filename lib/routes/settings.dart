@@ -67,6 +67,8 @@ class _SettingsState extends State<Settings> {
 
   @override
   Widget build(BuildContext context) {
+    double iconSize = Theme.of(context).iconTheme.size ?? 32.0;
+
     return Scaffold(
       body: SafeArea(
         child: Column(
@@ -77,7 +79,8 @@ class _SettingsState extends State<Settings> {
                 onPressed: () {
                   Navigator.pop(context);
                 },
-                size: Theme.of(context).iconTheme.size ?? 32.0,
+                size: iconSize,
+                borderWidth: iconSize * 0.04,
                 child: const Icon(
                   Icons.chevron_left,
                 ),
