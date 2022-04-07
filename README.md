@@ -84,6 +84,14 @@ As prefaced in the demo devoted to a single wheel the goal is to show a solid bo
 
 _Please note:_ in the demo the wheel for the border precedes the one dedicated to the numbers, to preserve the scrolling. This means the border is actually behind the digits. In the moment you disable physics scrolling and manage the wheel with a controller it is reasonable to swap the two widgets.
 
+### intro_animation
+
+As a form of splash screen the goal is to show the name of the application in a similar scroll as the one used for the digits.
+
+Instead of moving the letters top to bottom, however, the idea is to have the animation side to side. This mirrors the position of the letters and is helpful to move to the home screen similarly to how the home screen moves to the settings page.
+
+For the horizontal wheel rotate the entire list a quarter turn back, the list items a quarter turn forward to keep them straight up.
+
 ## App
 
 ### Infinite scroll
