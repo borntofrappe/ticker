@@ -73,3 +73,7 @@ return MaterialApp(
   )
 );
 ```
+
+### Routes
+
+In the `routes` subfolder implement the logic for the application's screens.
