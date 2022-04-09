@@ -1,7 +1,55 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+
 import 'package:ticker/widgets/custom_button.dart';
+
 import 'dart:math';
 import 'dart:ui';
+
+class WheelsChangeNotifier extends ChangeNotifier {
+  List<FixedExtentScrollController> controllers = [];
+
+  void initialize(List<FixedExtentScrollController> initControllers) {
+    controllers = [];
+    for (FixedExtentScrollController controller in initControllers) {
+      controllers.add(controller);
+    }
+  }
+
+  int selectedItem(int controllerIndex) {
+    return controllers[controllerIndex].selectedItem;
+  }
+
+  void jumpToItem(int controllerIndex, int itemIndex) {
+    controllers[controllerIndex].jumpToItem(itemIndex);
+  }
+
+  void scroll(int direction) {
+    direction *= -1;
+
+    int index = controllers.length;
+
+    do {
+      index -= 1;
+
+      FixedExtentScrollController controller = controllers[index];
+
+      if (direction == -1 && controller.selectedItem == 0) {
+        controller.jumpToItem(10);
+      } else if (direction == 1 && controller.selectedItem == 10) {
+        controller.jumpToItem(0);
+      }
+
+      controller.animateToItem(
+        controller.selectedItem + 1 * direction,
+        duration: const Duration(milliseconds: 250),
+        curve: Curves.decelerate,
+      );
+    } while (index > 0 &&
+        ((direction == 1 && controllers[index].selectedItem % 10 == 0) ||
+            (direction == -1 && controllers[index].selectedItem == 1)));
+  }
+}
 
 class Home extends StatelessWidget {
   const Home({Key? key}) : super(key: key);
@@ -10,18 +58,21 @@ class Home extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       body: SafeArea(
-        child: Column(
-          children: const [
-            Navigation(),
-            Expanded(
-              flex: 3,
-              child: Wheels(),
-            ),
-            Expanded(
-              flex: 2,
-              child: Buttons(),
-            ),
-          ],
+        child: ChangeNotifierProvider(
+          create: (_) => WheelsChangeNotifier(),
+          child: Column(
+            children: const [
+              Navigation(),
+              Expanded(
+                flex: 3,
+                child: Wheels(),
+              ),
+              Expanded(
+                flex: 2,
+                child: Buttons(),
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -52,22 +103,50 @@ class Navigation extends StatelessWidget {
   }
 }
 
-class Wheels extends StatelessWidget {
+class Wheels extends StatefulWidget {
   final int count;
+
   const Wheels({Key? key, this.count = 3}) : super(key: key);
 
-  static double margin = 4.0;
+  @override
+  State<Wheels> createState() => _WheelsState();
+}
+
+class _WheelsState extends State<Wheels> {
+  List<FixedExtentScrollController> _controllers = [];
+
+  @override
+  void initState() {
+    super.initState();
+
+    _controllers = List<FixedExtentScrollController>.generate(
+        widget.count, (_) => FixedExtentScrollController());
+  }
+
+  @override
+  void dispose() {
+    for (FixedExtentScrollController controller in _controllers) {
+      controller.dispose();
+    }
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
+    const double margin = 4.0;
+    Provider.of<WheelsChangeNotifier>(context, listen: false)
+        .initialize(_controllers);
+
     return LayoutBuilder(
       builder: (BuildContext context, BoxConstraints constraints) {
         double width = constraints.maxWidth;
         double height = constraints.maxHeight;
-        double itemExtent =
-            min(200.0, (min(width, height) - 2 * margin * count) / count);
+        double itemExtent = min(
+            200.0,
+            (min(width, height) - 2 * margin * _controllers.length) /
+                _controllers.length);
 
-        double maxWidth = (itemExtent + margin * 2) * count;
+        double maxWidth = (itemExtent + margin * 2) * _controllers.length;
 
         return Center(
           child: ConstrainedBox(
@@ -75,15 +154,19 @@ class Wheels extends StatelessWidget {
               maxWidth: maxWidth,
             ),
             child: Row(
-              children: List<Widget>.generate(
-                count,
-                (index) => Expanded(
-                  child: Container(
-                    margin: EdgeInsets.symmetric(horizontal: margin),
-                    child: Wheel(itemExtent: itemExtent),
-                  ),
-                ),
-              ),
+              children: _controllers
+                  .map(
+                    (controller) => Expanded(
+                      child: Container(
+                        margin: const EdgeInsets.symmetric(horizontal: margin),
+                        child: Wheel(
+                          itemExtent: itemExtent,
+                          controller: controller,
+                        ),
+                      ),
+                    ),
+                  )
+                  .toList(),
             ),
           ),
         );
@@ -94,8 +177,14 @@ class Wheels extends StatelessWidget {
 
 class Wheel extends StatelessWidget {
   final double itemExtent;
+  final FixedExtentScrollController controller;
+  const Wheel({
+    Key? key,
+    required this.itemExtent,
+    required this.controller,
+  }) : super(key: key);
 
-  const Wheel({Key? key, required this.itemExtent}) : super(key: key);
+  static const int _digits = 10;
 
   @override
   Widget build(BuildContext context) {
@@ -104,13 +193,15 @@ class Wheel extends StatelessWidget {
         children: [
           ListWheelScrollView(
             overAndUnderCenterOpacity: 0,
+            physics: const NeverScrollableScrollPhysics(),
+            controller: controller,
             itemExtent: itemExtent,
             children: List<Widget>.generate(
-              10,
+              _digits + 1,
               (index) => Item(
-                digit: index,
+                digit: index % _digits,
               ),
-            ),
+            ).reversed.toList(),
           ),
           ExcludeSemantics(
             child: ListWheelScrollView(
@@ -180,7 +271,8 @@ class Buttons extends StatelessWidget {
         children: <Widget>[
           CustomButton(
             onPressed: () {
-              // scroll wheels
+              Provider.of<WheelsChangeNotifier>(context, listen: false)
+                  .scroll(-1);
             },
             child: const AspectRatio(
               aspectRatio: 1.0,
@@ -204,7 +296,8 @@ class Buttons extends StatelessWidget {
           ),
           CustomButton(
             onPressed: () {
-              // scroll wheels
+              Provider.of<WheelsChangeNotifier>(context, listen: false)
+                  .scroll(1);
             },
             child: const AspectRatio(
               aspectRatio: 1.0,

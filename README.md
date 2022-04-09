@@ -105,3 +105,11 @@ fontFeatures: [
   FontFeature.caseSensitiveForms(),
 ],
 ```
+
+### Change notifier
+
+Applied to multiple wheels instead of a single one, the approach relies on populating a list with the controllers initialized in a stateful widget, and then manouver the scroll position through said list. I am positive the approach is flawed, but it works.
+
+### Order
+
+Flip the order of the numbers in the wheel so that the counter moves upwards to increment the value.

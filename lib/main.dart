@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import 'package:ticker/routes/splash_screen.dart';
+// import 'package:ticker/routes/splash_screen.dart';
 import 'package:ticker/routes/home.dart';
 import 'package:ticker/routes/settings.dart';
 
