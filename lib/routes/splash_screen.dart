@@ -39,8 +39,7 @@ class _SplashScreenState extends State<SplashScreen> {
             )
                 .then(
               (_) {
-                // here you'd move to the home widget with Navigator.pushNamed
-                print('Done');
+                Navigator.pushReplacementNamed(context, '/home');
               },
             );
           },

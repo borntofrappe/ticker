@@ -74,6 +74,16 @@ return MaterialApp(
 );
 ```
 
-### Routes
+### Splash sreen
 
-In the `routes` subfolder implement the logic for the application's screens.
+Start by adding the splash screen widget in an instance of material app. Define a primary color through `ThemeData` so that the value is picked up by widget.
+
+### Navigation
+
+Add the function producing the sliding animation to move from the splash screen to the home widget.
+
+In splash screen use `Navigator.pushReplacementNamed` to remove the widget only after the animation finishes.
+
+To test the function add also a button to move between the home screen and settings' page. This time use `Navigator.pushNamed` to have the home widget persist below the new route.
+
+_Please note:_ it is likely the flow of the application might change as I further develop the page devoted to the settings.

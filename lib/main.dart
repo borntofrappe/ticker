@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
 
 import 'package:ticker/routes/splash_screen.dart';
+import 'package:ticker/routes/home.dart';
+import 'package:ticker/routes/settings.dart';
+
+import 'package:ticker/helpers/slide_to_route.dart';
 
 void main() {
   runApp(const App());
@@ -19,6 +23,23 @@ class App extends StatelessWidget {
       home: const SplashScreen(
         text: 'Ticker',
       ),
+      onGenerateRoute: (RouteSettings settings) {
+        if (settings.name == '/home') {
+          return slideToRoute(
+            const Home(),
+            const Duration(
+              seconds: 1,
+            ),
+          );
+        } else if (settings.name == '/settings') {
+          return slideToRoute(
+            const Settings(),
+          );
+        }
+
+        assert(false, '$settings.name is not implemented');
+        return null;
+      },
     );
   }
 }
