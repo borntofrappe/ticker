@@ -43,3 +43,11 @@ Past the splash screen the application is meant to have two screens, home page a
 `slideToRoute` returns an instance of `PageRouteBuilder`. Once you have the function define the transition in the `onGenerateRoute` field of the material application and for the prescribed route.
 
 The builder is used as the application uses `Navigator.pushNamed`.
+
+### custom_button
+
+The application relies on several buttons to update the counter, move to the settings page and again update the application's preferences. To mirror the design of the wheels the goal is to have squared buttons with a rectangular border.
+
+It is possible to implement the design with and `ElevatedButton` or again with an `OutlinedButton`, and the demo shows how. The choice between the two is debatable. The material API describes elevated button as a primary button, with the biggest emphasis. Is the connotation purely a matter of design or semantics? Should primary buttons be elevated, secondary buttons outlined? Since the design of the buttons in the application is the same for all buttons it might be acceptable to rely on a single widget.
+
+In terms of implementation I lean toward outlined button, since the widget has a border by default and requires less code to change the starting assumptions — see elevation and shadow color.
