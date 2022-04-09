@@ -20,9 +20,13 @@ class App extends StatelessWidget {
         primaryColor: Colors.black87,
         fontFamily: 'Inter',
       ),
+
+      /* TODO: add splash screen instead of Home()
       home: const SplashScreen(
         text: 'Ticker',
-      ),
+      )
+      */
+      home: const Home(),
       onGenerateRoute: (RouteSettings settings) {
         if (settings.name == '/home') {
           return slideToRoute(

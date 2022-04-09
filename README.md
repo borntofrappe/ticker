@@ -87,3 +87,21 @@ In splash screen use `Navigator.pushReplacementNamed` to remove the widget only 
 To test the function add also a button to move between the home screen and settings' page. This time use `Navigator.pushNamed` to have the home widget persist below the new route.
 
 _Please note:_ it is likely the flow of the application might change as I further develop the page devoted to the settings.
+
+### Home
+
+Start with the design of the home screen divving up a column in three sections:
+
+1. navigation, with a button to move to the settings' page
+
+2. wheels, with the `ListWheelScrollView` widgets — currently in a fixed number and without the associated controller. The idea is to focus on the appearance only
+
+3. buttons, with the buttons ultimately updating the counter — currently with an empty `onPressed` field
+
+A note on the buttons: import `dart:ui`. The library helps to vertically align the plus and minus sign used in the buttons with the custom font.
+
+```dart
+fontFeatures: [
+  FontFeature.caseSensitiveForms(),
+],
+```
