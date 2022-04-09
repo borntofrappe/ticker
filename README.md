@@ -51,3 +51,9 @@ The application relies on several buttons to update the counter, move to the set
 It is possible to implement the design with and `ElevatedButton` or again with an `OutlinedButton`, and the demo shows how. The choice between the two is debatable. The material API describes elevated button as a primary button, with the biggest emphasis. Is the connotation purely a matter of design or semantics? Should primary buttons be elevated, secondary buttons outlined? Since the design of the buttons in the application is the same for all buttons it might be acceptable to rely on a single widget.
 
 In terms of implementation I lean toward outlined button, since the widget has a border by default and requires less code to change the starting assumptions — see elevation and shadow color.
+
+### custom_checkbox
+
+In the settings page the application allows to customize preferences with several widgets, among which a checkbox to save the counter locally. It would be possible to use a `Switch` or `Checkbox` widget, but I ultimately prefer to follow the example and design of the custom button. The demo shows how to implement a toggle with a stateful widget which renders the child widget pending a boolean condition. The widget also receives a function which is called with the updated value, so that ultimately the parent widget is able to enact the desired feature.
+
+Out of preference I've chosen to remove the overlay color.
