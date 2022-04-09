@@ -40,19 +40,34 @@ class Wheels extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    double width = MediaQuery.of(context).size.width;
-    double itemExtent = min(200.0, (width - 2 * margin * wheels) / wheels);
+    return LayoutBuilder(
+      builder: (BuildContext context, BoxConstraints constraints) {
+        double width = constraints.maxWidth;
+        double height = constraints.maxHeight;
+        double itemExtent =
+            min(200.0, (min(width, height) - 2 * margin * wheels) / wheels);
 
-    return Row(
-      children: List<Widget>.generate(
-        wheels,
-        (index) => Expanded(
-          child: Container(
-            margin: EdgeInsets.symmetric(horizontal: margin),
-            child: Wheel(itemExtent: itemExtent),
+        double maxWidth = (itemExtent + margin * 2) * wheels;
+
+        return Center(
+          child: ConstrainedBox(
+            constraints: BoxConstraints(
+              maxWidth: maxWidth,
+            ),
+            child: Row(
+              children: List<Widget>.generate(
+                wheels,
+                (index) => Expanded(
+                  child: Container(
+                    margin: EdgeInsets.symmetric(horizontal: margin),
+                    child: Wheel(itemExtent: itemExtent),
+                  ),
+                ),
+              ),
+            ),
           ),
-        ),
-      ),
+        );
+      },
     );
   }
 }

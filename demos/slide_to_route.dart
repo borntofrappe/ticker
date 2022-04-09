@@ -4,14 +4,12 @@ void main() {
   runApp(const App());
 }
 
-PageRouteBuilder<dynamic> slideToRoute(Widget child) {
+PageRouteBuilder<dynamic> slideToRoute(Widget child, [Duration? duration]) {
   return PageRouteBuilder(
     pageBuilder: (BuildContext context, Animation animation,
             Animation secondaryAnimation) =>
         child,
-    transitionDuration: const Duration(
-      milliseconds: 500,
-    ),
+    transitionDuration: duration ?? const Duration(milliseconds: 500),
     transitionsBuilder: (BuildContext context, Animation animation,
         Animation secondaryAnimation, Widget child) {
       Offset begin = const Offset(1.0, 0.0);

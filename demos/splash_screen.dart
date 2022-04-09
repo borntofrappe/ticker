@@ -13,20 +13,20 @@ class App extends StatelessWidget {
       theme: ThemeData(
         primaryColor: Colors.black87,
       ),
-      home: const Intro(text: 'ticker'),
+      home: const SplashScreen(text: 'ticker'),
     );
   }
 }
 
-class Intro extends StatefulWidget {
+class SplashScreen extends StatefulWidget {
   final String text;
-  const Intro({Key? key, this.text = 'Wheeeel!'}) : super(key: key);
+  const SplashScreen({Key? key, this.text = 'Wheeeel!'}) : super(key: key);
 
   @override
-  State<Intro> createState() => _IntroState();
+  State<SplashScreen> createState() => _SplashScreenState();
 }
 
-class _IntroState extends State<Intro> {
+class _SplashScreenState extends State<SplashScreen> {
   static const double _itemExtent = 200.0;
 
   late FixedExtentScrollController _controller;
