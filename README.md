@@ -57,3 +57,19 @@ In terms of implementation I lean toward outlined button, since the widget has a
 In the settings page the application allows to customize preferences with several widgets, among which a checkbox to save the counter locally. It would be possible to use a `Switch` or `Checkbox` widget, but I ultimately prefer to follow the example and design of the custom button. The demo shows how to implement a toggle with a stateful widget which renders the child widget pending a boolean condition. The widget also receives a function which is called with the updated value, so that ultimately the parent widget is able to enact the desired feature.
 
 Out of preference I've chosen to remove the overlay color.
+
+## App
+
+Following the projects in the `demos` folder the application is developed in the `lib` directory. In increments.
+
+### Fonts
+
+In the `fonts` folder add the family chosen for the project. Reference the files in `pubspec.yaml` and the font at app level.
+
+```dart
+return MaterialApp(
+  theme: ThemeData(
+    fontFamily: 'Inter',
+  )
+);
+```
