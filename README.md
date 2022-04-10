@@ -68,6 +68,20 @@ The wheels are ultimately managed with a controller. The demo shows how to imple
 
 I ultimately prefer the second option since the index in the scrolling widget is then limited to a given range. In the first instance the index might become exceedingly small or large as the wheel continues producing items in a given direction.
 
+With this in mind the application is meant to show higher numbers above lower values. One way to achieve the desired layout is by:
+
+1. reversing the list describing the digits
+
+2. swapping the direction for the controller
+
+The added difficulty comes in the form of the index referring to the selected item. As the wheel moves upwards, toward greater values as it were, the index becomes smaller.
+
+Display the selected item to debug the interfance.
+
+```dart
+print(_controller.selectedItem);
+```
+
 ## App
 
 Following the projects in the `demos` folder the application is developed in the `lib` directory. In increments.
