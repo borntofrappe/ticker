@@ -98,7 +98,7 @@ class Navigation extends StatelessWidget {
     return ListTile(
       trailing: CustomButton(
         onPressed: () {
-          // Navigator.pushNamed(context, '/settings');
+          Navigator.pushNamed(context, '/settings');
         },
         child: const Icon(
           Icons.chevron_right,

@@ -315,3 +315,9 @@ controller.animateToItem()
 ```diff
 -_controllers[index].animateToItem()
 ```
+
+### Settings
+
+In terms of design add an icon to move back to the home screen, a list tile with the name of the application and an additional list tile to preface the app prefernces.
+
+Include the app preferences in a `ListView` widget with a series of dedicated components. Since
