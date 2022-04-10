@@ -58,6 +58,16 @@ In the settings page the application allows to customize preferences with severa
 
 Out of preference I've chosen to remove the overlay color.
 
+### infinite_wheel
+
+The wheels are ultimately managed with a controller. The demo shows how to implement the wheel always showing numbers in a given range — 0 to 9 — in two possible ways:
+
+1. with a looping wheel relying on the `ListWheelChildLoopingListDelegate` widget
+
+2. with a regular wheel with one more item than necessary. Since the application is managed with a controller the idea is to immediately jump to either end of the list before animation.
+
+I ultimately prefer the second option since the index in the scrolling widget is then limited to a given range. In the first instance the index might become exceedingly small or large as the wheel continues producing items in a given direction.
+
 ## App
 
 Following the projects in the `demos` folder the application is developed in the `lib` directory. In increments.
@@ -108,8 +118,4 @@ fontFeatures: [
 
 ### Change notifier
 
-Applied to multiple wheels instead of a single one, the approach relies on populating a list with the controllers initialized in a stateful widget, and then manouver the scroll position through said list. I am positive the approach is flawed, but it works.
-
-### Order
-
-Flip the order of the numbers in the wheel so that the counter moves upwards to increment the value.
+I am positive the approach is flawed, but it works. The challenge with respect to the smaller project in the demos folder is that there are multiple wheels, multiple controllers.
