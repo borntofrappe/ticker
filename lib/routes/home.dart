@@ -6,48 +6,53 @@ import 'package:ticker/widgets/custom_button.dart';
 import 'dart:math';
 import 'dart:ui';
 
-class WheelsChangeNotifier extends ChangeNotifier {
-  List<FixedExtentScrollController> controllers = [];
+const int _digits = 10;
 
-  void initialize(List<FixedExtentScrollController> initControllers) {
-    controllers = [];
-    for (FixedExtentScrollController controller in initControllers) {
-      controllers.add(controller);
+class WheelsChangeNotifier extends ChangeNotifier {
+  List<FixedExtentScrollController> _controllers = [];
+
+  void initialize(List<FixedExtentScrollController> controllers) {
+    _controllers = [];
+    for (FixedExtentScrollController controller in controllers) {
+      _controllers.add(controller);
     }
   }
 
-  int selectedItem(int controllerIndex) {
-    return controllers[controllerIndex].selectedItem;
-  }
-
-  void jumpToItem(int controllerIndex, int itemIndex) {
-    controllers[controllerIndex].jumpToItem(itemIndex);
-  }
-
   void scroll(int direction) {
+    int duration = 400 ~/ _controllers.length;
+    int delay = 0;
+
     direction *= -1;
 
-    int index = controllers.length;
+    int index = _controllers.length;
 
     do {
       index -= 1;
 
-      FixedExtentScrollController controller = controllers[index];
+      FixedExtentScrollController controller = _controllers[index];
+      int selectedItem = controller.selectedItem;
 
-      if (direction == -1 && controller.selectedItem == 0) {
-        controller.jumpToItem(10);
-      } else if (direction == 1 && controller.selectedItem == 10) {
+      if (direction == -1 && selectedItem == 0) {
+        controller.jumpToItem(_digits);
+      } else if (direction == 1 && selectedItem == _digits) {
         controller.jumpToItem(0);
       }
 
-      controller.animateToItem(
-        controller.selectedItem + 1 * direction,
-        duration: const Duration(milliseconds: 250),
-        curve: Curves.decelerate,
+      Future.delayed(
+        Duration(milliseconds: delay),
+        () {
+          controller.animateToItem(
+            controller.selectedItem + 1 * direction,
+            duration: Duration(milliseconds: duration),
+            curve: Curves.easeInOutQuad,
+          );
+        },
       );
+
+      delay += duration ~/ 3;
     } while (index > 0 &&
-        ((direction == 1 && controllers[index].selectedItem % 10 == 0) ||
-            (direction == -1 && controllers[index].selectedItem == 1)));
+        ((direction == 1 && _controllers[index].selectedItem % _digits == 0) ||
+            (direction == -1 && _controllers[index].selectedItem == 1)));
   }
 }
 
@@ -58,21 +63,27 @@ class Home extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       body: SafeArea(
-        child: ChangeNotifierProvider(
-          create: (_) => WheelsChangeNotifier(),
-          child: Column(
-            children: const [
-              Navigation(),
-              Expanded(
-                flex: 3,
-                child: Wheels(),
+        child: Column(
+          children: [
+            const Navigation(),
+            Expanded(
+              child: ChangeNotifierProvider(
+                create: (_) => WheelsChangeNotifier(),
+                child: Column(
+                  children: const <Widget>[
+                    Expanded(
+                      flex: 3,
+                      child: Wheels(),
+                    ),
+                    Expanded(
+                      flex: 2,
+                      child: Buttons(),
+                    ),
+                  ],
+                ),
               ),
-              Expanded(
-                flex: 2,
-                child: Buttons(),
-              ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );
@@ -105,8 +116,13 @@ class Navigation extends StatelessWidget {
 
 class Wheels extends StatefulWidget {
   final int count;
+  final int value;
 
-  const Wheels({Key? key, this.count = 3}) : super(key: key);
+  const Wheels({
+    Key? key,
+    this.count = 3,
+    this.value = 0,
+  }) : super(key: key);
 
   @override
   State<Wheels> createState() => _WheelsState();
@@ -120,7 +136,23 @@ class _WheelsState extends State<Wheels> {
     super.initState();
 
     _controllers = List<FixedExtentScrollController>.generate(
-        widget.count, (_) => FixedExtentScrollController());
+      widget.count,
+      (_) => FixedExtentScrollController(),
+    );
+
+    WidgetsBinding.instance?.addPostFrameCallback(
+      (_) {
+        int value = widget.value;
+        if (value > 0) {
+          Future.delayed(
+            const Duration(seconds: 1),
+            () {
+              _scrollTo(widget.value);
+            },
+          );
+        }
+      },
+    );
   }
 
   @override
@@ -128,12 +160,45 @@ class _WheelsState extends State<Wheels> {
     for (FixedExtentScrollController controller in _controllers) {
       controller.dispose();
     }
+
     super.dispose();
+  }
+
+  void _scrollTo(value) {
+    int duration = 2000 ~/ _controllers.length;
+    int delay = 0;
+
+    int index = _controllers.length - 1;
+
+    while (value > 0 && index >= 0) {
+      int digit = value % _digits;
+
+      FixedExtentScrollController controller = _controllers[index];
+
+      controller.jumpToItem(_digits);
+
+      Future.delayed(
+        Duration(milliseconds: delay),
+        () {
+          controller.animateToItem(
+            _digits - digit,
+            duration: Duration(milliseconds: duration),
+            curve: Curves.easeInOutCubic,
+          );
+        },
+      );
+
+      delay += duration - (duration ~/ 2);
+
+      value = value ~/ _digits;
+      index--;
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     const double margin = 4.0;
+
     Provider.of<WheelsChangeNotifier>(context, listen: false)
         .initialize(_controllers);
 
@@ -178,13 +243,12 @@ class _WheelsState extends State<Wheels> {
 class Wheel extends StatelessWidget {
   final double itemExtent;
   final FixedExtentScrollController controller;
+
   const Wheel({
     Key? key,
     required this.itemExtent,
     required this.controller,
   }) : super(key: key);
-
-  static const int _digits = 10;
 
   @override
   Widget build(BuildContext context) {
@@ -224,9 +288,9 @@ class Item extends StatelessWidget {
   final double? borderWidth;
 
   const Item({
+    Key? key,
     this.digit,
     this.borderWidth,
-    Key? key,
   }) : super(key: key);
 
   @override

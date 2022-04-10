@@ -133,3 +133,185 @@ fontFeatures: [
 ### Change notifier
 
 I am positive the approach is flawed, but it works. The challenge with respect to the smaller project in the demos folder is that there are multiple wheels, multiple controllers.
+
+Define the class which extends `ChangeNotifier` with an empty list of controllers.
+
+```dart
+class WheelsChangeNotifier extends ChangeNotifier {
+  List<FixedExtentScrollController> _controllers = [];
+}
+```
+
+Define a method to populate the list with actual controllers.
+
+```dart
+void initialize(List<FixedExtentScrollController> controllers) {
+  _controllers = [];
+  for (FixedExtentScrollController controller in controllers) {
+    _controllers.add(controller);
+  }
+}
+```
+
+Assigning an empty list first works to remove existing references to controllers, but not controllers. This is because the actual instances are handled in the stateful component making up the wheels.
+
+Wrap the widgets describing the wheels and the buttons in a `ChangeNotifierProvider` so that both components have access to the list.
+
+```dart
+child: ChangeNotifierProvider(
+  create: (_) => WheelsChangeNotifier(),
+  child: Column(
+    // wheels and buttons
+  )
+)
+```
+
+Make the widget devoted to the wheels a stateful widget. Here, initialize a list of controllers for the actual lists.
+
+```dart
+class _WheelsState extends State<Wheels> {
+  List<FixedExtentScrollController> _controllers = [];
+}
+```
+
+In the `initState` lifecycle initialize the controllers and pass them to the individual wheel widgets to manage the scrolling. This is not difference from the `infinite_wheel` demo.
+
+What is different is that in the `build` method you use the provider to add the controllers in the separate list.
+
+```dart
+Provider.of<WheelsChangeNotifier>(context, listen: false).initialize(_controllers);
+```
+
+The list is updated so that finally the buttons are able to reference the controllers from the separate widget.
+
+```dart
+onPressed: () {
+  Provider.of<WheelsChangeNotifier>(context, listen: false)._controllers[0]; // do something
+},
+```
+
+### Scrolling
+
+In the instance of `ChangeNotifier` describe how to update the wheels with a `scroll` method. The functionality is similar to the `infinite_wheel.dart` demo, but is expanded to consider all the existing digits, from the unit to the tens to the hundreds.
+
+The idea is to start from the last column, update the item and if the number exceeds the range, in either direction, repeat the process for the preceding set.
+
+### Initial scroll
+
+In the moment the application stores the count value locally it is helpful to have the stateful widget update the controllers on the basis of an input variable.
+
+Since the logic relies on the `ListWheelScrollView` widgets actually existing include the instructions in the `initState` lifecycle _and_ a function which runs as the widget is built.
+
+```dart
+// initialize controllers
+
+WidgetsBinding.instance?.addPostFrameCallback((_) {
+    // update controllers
+});
+```
+
+Note that the order of the numbers in the lists is reversed, so you need to map the individual digits to the corresponding index.
+
+Once you extract the number for each column in a variable `digit`:
+
+- update the controllers to jump at the bottom of the wheel
+
+  ```dart
+  _controllers[index].jumpToItem(_digits);
+  ```
+
+- animate the controllers back to the correct value
+
+  ```dart
+  _controllers[index].animateToItem(
+      _digits - digit,
+      // ...
+  )
+  ```
+
+To compute the digit consider the input value and begin with the last column.
+
+```dart
+int value = widget.value;
+int index = _controllers.length - 1;
+```
+
+In a while loop continue extracting the digit as long as 1. the count is a positive number and 2. there are columns left.
+
+```dart
+while(value > 0 && index >= 0) {
+}
+```
+
+Extract the digit with the modulo operator.
+
+```dart
+int digit = value % _digits;
+```
+
+Once you update the controller update the count and index to eventually exit the loop.
+
+```dart
+value = value ~/ _digits;
+index --;
+```
+
+`~/` works as a shorthand for integer division, `(count / digits).toInt()`.
+
+### Staggered animation
+
+The goal is to stagger the scrolling animation, both for successive columns and for the initial count.
+
+For either start with a value describing the total duration and compute the number of milliseconds devoted to each digit.
+
+For successive columns devote up to 500 milliseconds, in case every column is updated.
+
+```dart
+int duration = 500 ~/ _controllers.length;
+```
+
+For the initial count devote up to 2 seconds, since it is ultimately possible to scroll to higher digits and the animation introduces the application.
+
+```dart
+int duration = 2000 ~/ _controllers.length;
+```
+
+_Please note:_ the duration and curves might change as I test the application on an actual device.
+
+Initialize a variable to keep track of the delay and increment this number with each column, with each digit.
+
+```dart
+// successive column
+delay += duration ~/ 3;
+
+// initial count
+delay += duration - (duration ~/ 2);
+```
+
+Consider a smaller amount than the total duration to have successive scrolls take place before the previous instance has had a chance to finish.
+
+Use `Future.delayed` to animate the controller after the prescribed delay.
+
+```dart
+Future.delayed(
+  Duration(milliseconds: delay),,
+  () {
+    // animateToItem
+  }
+);
+```
+
+Most importantly, be sure that the delayed animation actually updates the current controller. This means either extracting the index in a separate variable or the controller itself.
+
+```dart
+FixedExtentScrollController controller = _controllers[index];
+
+// later
+controller.animateToItem()
+```
+
+`index` is updated in the while loop so that using the variable would mean the method would be applied on the last available instance.
+
+```diff
+-_controllers[index].animateToItem()
+```
