@@ -5,16 +5,21 @@ import 'package:ticker/widgets/custom_button.dart';
 import 'package:ticker/widgets/custom_checkbox_list_tile.dart';
 
 class Settings extends StatelessWidget {
-  const Settings({Key? key}) : super(key: key);
+  final int scrollValue;
+
+  const Settings({
+    Key? key,
+    this.scrollValue = 0,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: SafeArea(
         child: Column(
-          children: const <Widget>[
-            Navigation(),
-            ListTile(
+          children: <Widget>[
+            const Navigation(),
+            const ListTile(
               title: Text(
                 'Ticker',
                 style: TextStyle(
@@ -24,7 +29,9 @@ class Settings extends StatelessWidget {
               ),
             ),
             Expanded(
-              child: Preferences(),
+              child: Preferences(
+                scrollValue: scrollValue,
+              ),
             ),
           ],
         ),
@@ -58,7 +65,12 @@ class Navigation extends StatelessWidget {
 }
 
 class Preferences extends StatefulWidget {
-  const Preferences({Key? key}) : super(key: key);
+  final int scrollValue;
+
+  const Preferences({
+    Key? key,
+    required this.scrollValue,
+  }) : super(key: key);
 
   @override
   State<Preferences> createState() => _PreferencesState();
@@ -90,6 +102,18 @@ class _PreferencesState extends State<Preferences> {
     preferences.setBool(key, value ?? false);
   }
 
+  void setIntPreference(String key, int value) async {
+    final preferences = await SharedPreferences.getInstance();
+    preferences.setInt(key, value);
+  }
+
+  void removePreference(String key) async {
+    final preferences = await SharedPreferences.getInstance();
+    if (preferences.containsKey(key)) {
+      preferences.remove(key);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return ListView(
@@ -105,9 +129,14 @@ class _PreferencesState extends State<Preferences> {
         ),
         CustomCheckboxListTile(
           title: const Text('Forget me not'),
-          subtitle: const Text('Test out shared preferences.'),
+          subtitle: const Text('Save your number for the next time.'),
           onChanged: (bool? value) {
             setBoolPreference('forget-me-not', value);
+            if (value ?? false) {
+              setIntPreference('scroll-value', widget.scrollValue);
+            } else {
+              removePreference('scroll-value');
+            }
           },
           value: _forgetMeNot,
         ),

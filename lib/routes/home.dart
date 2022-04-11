@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:ticker/widgets/custom_button.dart';
+
+import 'package:ticker/helpers/screen_arguments.dart';
 
 import 'dart:math';
 import 'dart:ui';
@@ -11,6 +14,19 @@ const int _digits = 10;
 class WheelsChangeNotifier extends ChangeNotifier {
   List<FixedExtentScrollController> _controllers = [];
 
+  void optionallySaveScrollValue() async {
+    final preferences = await SharedPreferences.getInstance();
+
+    bool forgetMeNot = preferences.getBool('forget-me-not') ?? false;
+
+    if (forgetMeNot) {
+      preferences.setInt(
+        'scroll-value',
+        getScrollValue(),
+      );
+    }
+  }
+
   void initialize(List<FixedExtentScrollController> controllers) {
     _controllers = [];
     for (FixedExtentScrollController controller in controllers) {
@@ -19,7 +35,8 @@ class WheelsChangeNotifier extends ChangeNotifier {
   }
 
   void scroll(int direction) {
-    int duration = 400 ~/ _controllers.length;
+    const int scrollDuration = 400;
+    int duration = scrollDuration ~/ _controllers.length;
     int delay = 0;
 
     direction *= -1;
@@ -53,6 +70,26 @@ class WheelsChangeNotifier extends ChangeNotifier {
     } while (index > 0 &&
         ((direction == 1 && _controllers[index].selectedItem % _digits == 0) ||
             (direction == -1 && _controllers[index].selectedItem == 1)));
+
+    Future.delayed(
+      const Duration(milliseconds: scrollDuration),
+      () {
+        optionallySaveScrollValue();
+      },
+    );
+  }
+
+  int getScrollValue() {
+    int value = 0;
+    int index = _controllers.length - 1;
+
+    while (index >= 0) {
+      int digit = (_digits - _controllers[index].selectedItem) % _digits;
+      value += digit * pow(10, _controllers.length - index - 1).toInt();
+
+      index--;
+    }
+    return value;
   }
 }
 
@@ -63,27 +100,21 @@ class Home extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       body: SafeArea(
-        child: Column(
-          children: [
-            const Navigation(),
-            Expanded(
-              child: ChangeNotifierProvider(
-                create: (_) => WheelsChangeNotifier(),
-                child: Column(
-                  children: const <Widget>[
-                    Expanded(
-                      flex: 3,
-                      child: Wheels(),
-                    ),
-                    Expanded(
-                      flex: 2,
-                      child: Buttons(),
-                    ),
-                  ],
-                ),
+        child: ChangeNotifierProvider(
+          create: (_) => WheelsChangeNotifier(),
+          child: Column(
+            children: const <Widget>[
+              Navigation(),
+              Expanded(
+                flex: 3,
+                child: Wheels(),
               ),
-            ),
-          ],
+              Expanded(
+                flex: 2,
+                child: Buttons(),
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -98,7 +129,15 @@ class Navigation extends StatelessWidget {
     return ListTile(
       trailing: CustomButton(
         onPressed: () {
-          Navigator.pushNamed(context, '/settings');
+          Navigator.pushNamed(
+            context,
+            '/settings',
+            arguments: ScreenArguments(
+              scrollValue:
+                  Provider.of<WheelsChangeNotifier>(context, listen: false)
+                      .getScrollValue(),
+            ),
+          );
         },
         child: const Icon(
           Icons.chevron_right,
@@ -116,12 +155,10 @@ class Navigation extends StatelessWidget {
 
 class Wheels extends StatefulWidget {
   final int count;
-  final int value;
 
   const Wheels({
     Key? key,
     this.count = 3,
-    this.value = 0,
   }) : super(key: key);
 
   @override
@@ -130,6 +167,24 @@ class Wheels extends StatefulWidget {
 
 class _WheelsState extends State<Wheels> {
   List<FixedExtentScrollController> _controllers = [];
+
+  void _optionallyGetScrollValue() async {
+    final preferences = await SharedPreferences.getInstance();
+
+    bool forgetMeNot = preferences.getBool('forget-me-not') ?? false;
+
+    if (forgetMeNot) {
+      int value = preferences.getInt('scroll-value') ?? 0;
+      if (value > 0) {
+        Future.delayed(
+          const Duration(seconds: 1),
+          () {
+            _scrollTo(value);
+          },
+        );
+      }
+    }
+  }
 
   @override
   void initState() {
@@ -142,15 +197,7 @@ class _WheelsState extends State<Wheels> {
 
     WidgetsBinding.instance?.addPostFrameCallback(
       (_) {
-        int value = widget.value;
-        if (value > 0) {
-          Future.delayed(
-            const Duration(seconds: 1),
-            () {
-              _scrollTo(widget.value);
-            },
-          );
-        }
+        _optionallyGetScrollValue();
       },
     );
   }

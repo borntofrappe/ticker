@@ -5,6 +5,7 @@ import 'package:ticker/routes/home.dart';
 import 'package:ticker/routes/settings.dart';
 
 import 'package:ticker/helpers/slide_to_route.dart';
+import 'package:ticker/helpers/screen_arguments.dart';
 
 void main() {
   runApp(const App());
@@ -32,8 +33,11 @@ class App extends StatelessWidget {
             ),
           );
         } else if (settings.name == '/settings') {
+          final args = settings.arguments as ScreenArguments;
           return slideToRoute(
-            const Settings(),
+            Settings(
+              scrollValue: args.scrollValue,
+            ),
           );
         }
 

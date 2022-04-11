@@ -354,7 +354,6 @@ void getBoolPreferences() async {
   setState(
     () {
       _shortOnTime = preferences.getBool('short-on-time') ?? false;
-      _forgetMeNot = preferences.getBool('forget-me-not') ?? false;
     },
   );
 }
@@ -371,3 +370,49 @@ void didUpdateWidget(oldWidget) {
   });
 }
 ```
+
+## Save scroll value
+
+Storing the value described by the wheels is more complex than toggling a boolean variable to condition the initial animation. This is because it should be possible to save the value both in the home and in the settings page, as the preference is ultimately toggled.
+
+Create `ScreenArguments` as a utility class — relevant as you pass arguments between routes.
+
+```dart
+class ScreenArguments {
+  int scrollValue;
+
+  ScreenArguments({
+    required this.scrollValue,
+  });
+}
+```
+
+In the `onGenerateRoute` field of the material app move to the settings page extracting the scroll value from the arguments of the home page.
+
+```dart
+final args = settings.arguments as ScreenArguments;
+return slideToRoute(
+  Settings(
+    scrollValue: args.scrollValue,
+  ),
+);
+```
+
+Regardless of how the value is computed — refer to a later section — pass the integer from the home page in `Navigator.pushNamed`.
+
+```dart
+Navigator.pushNamed(
+  context,
+  '/settings',
+  arguments: ScreenArguments(
+    scrollValue: scrollValue,
+),
+```
+
+In the settings page receive the value in the stateless widget, with the ultimate idea of passing the integer to `Preferences` and save the number in shared preferences if the matching checkbox is toggled.
+
+In the home page it is then necessary to save the value as the scroll position is changed. The approach might change in the future, but the current idea is to wait for the scroll animation to end and call a function to optionally save the value.
+
+Mirroring this action, and always in the home screen, it is finally necessary to retrieve the value as the page is first created. Again this action is optional and conditional to the user having selected the desired checkbox.
+
+To compute the scroll value the process is fundamentally the opposite of the one used to set the digits based on the initial count. Start by the last column and increment a counter variable, multiplying the digit by 1, 10, 100 on the basis of the column.
