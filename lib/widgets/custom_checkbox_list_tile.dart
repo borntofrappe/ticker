@@ -37,6 +37,14 @@ class _CustomCheckboxListTileState extends State<CustomCheckboxListTile> {
   }
 
   @override
+  void didUpdateWidget(oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    setState(() {
+      _value = widget.value;
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
     Function onChanged = widget.onChanged;
     Widget title = widget.title;

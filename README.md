@@ -325,3 +325,49 @@ controller.animateToItem()
 In terms of design add an icon to move back to the home screen, a list tile with the name of the application and an additional list tile to preface the app prefernces.
 
 Include the app preferences in a `ListView` widget with a series of dedicated components. Since
+
+## Shared preferences
+
+Install the library to manage app preferences and optionally save the counter as the app is terminated and opened anew.
+
+Use the library immediately in the splash screen to optionally reduce the animation.
+
+```dart
+final preferences = await SharedPreferences.getInstance();
+final bool shortOnTime = preferences.getBool('short-on-time') ?? false;
+```
+
+In the settings page update the preferences as the checkbox are toggled.
+
+```dart
+void setBoolPreference(String key, bool? value) async {
+  final preferences = await SharedPreferences.getInstance();
+  preferences.setBool(key, value ?? false);
+}
+```
+
+As the settings page is first created you need to also retrieve the preferences _and_ update the state of the checkboxes. Set the state from the parent widget.
+
+```dart
+void getBoolPreferences() async {
+  final preferences = await SharedPreferences.getInstance();
+  setState(
+    () {
+      _shortOnTime = preferences.getBool('short-on-time') ?? false;
+      _forgetMeNot = preferences.getBool('forget-me-not') ?? false;
+    },
+  );
+}
+```
+
+Update the state in the child widget through the `didUpdateWidget` lifecycle method.
+
+```dart
+@override
+void didUpdateWidget(oldWidget) {
+  super.didUpdateWidget(oldWidget);
+  setState(() {
+    _value = widget.value;
+  });
+}
+```

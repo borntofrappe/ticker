@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:ticker/widgets/custom_button.dart';
 import 'package:ticker/widgets/custom_checkbox_list_tile.dart';
@@ -11,9 +12,9 @@ class Settings extends StatelessWidget {
     return Scaffold(
       body: SafeArea(
         child: Column(
-          children: <Widget>[
-            const Navigation(),
-            const ListTile(
+          children: const <Widget>[
+            Navigation(),
+            ListTile(
               title: Text(
                 'Ticker',
                 style: TextStyle(
@@ -22,16 +23,7 @@ class Settings extends StatelessWidget {
                 ),
               ),
             ),
-            ListTile(
-              title: Text(
-                'Preferences'.toUpperCase(),
-                style: const TextStyle(
-                  fontSize: 14.0,
-                  color: Colors.black54,
-                ),
-              ),
-            ),
-            const Expanded(
+            Expanded(
               child: Preferences(),
             ),
           ],
@@ -65,33 +57,67 @@ class Navigation extends StatelessWidget {
   }
 }
 
-class Preferences extends StatelessWidget {
+class Preferences extends StatefulWidget {
   const Preferences({Key? key}) : super(key: key);
+
+  @override
+  State<Preferences> createState() => _PreferencesState();
+}
+
+class _PreferencesState extends State<Preferences> {
+  bool _shortOnTime = false;
+  bool _forgetMeNot = false;
+
+  @override
+  void initState() {
+    super.initState();
+
+    getBoolPreferences();
+  }
+
+  void getBoolPreferences() async {
+    final preferences = await SharedPreferences.getInstance();
+    setState(
+      () {
+        _shortOnTime = preferences.getBool('short-on-time') ?? false;
+        _forgetMeNot = preferences.getBool('forget-me-not') ?? false;
+      },
+    );
+  }
+
+  void setBoolPreference(String key, bool? value) async {
+    final preferences = await SharedPreferences.getInstance();
+    preferences.setBool(key, value ?? false);
+  }
 
   @override
   Widget build(BuildContext context) {
     return ListView(
       children: <Widget>[
-        CustomCheckboxListTile(
-          title: const Text('Forget me not'),
-          subtitle: const Text('Save your number for the next time.'),
-          onChanged: (bool? value) {
-            print(value);
-          },
+        ListTile(
+          title: Text(
+            'Preferences'.toUpperCase(),
+            style: const TextStyle(
+              fontSize: 14.0,
+              color: Colors.black54,
+            ),
+          ),
         ),
         CustomCheckboxListTile(
-          title: const Text('Zero zero zero'),
-          subtitle: const Text('Start fresh from the very beginning.'),
+          title: const Text('Forget me not'),
+          subtitle: const Text('Test out shared preferences.'),
           onChanged: (bool? value) {
-            print(value);
+            setBoolPreference('forget-me-not', value);
           },
+          value: _forgetMeNot,
         ),
         CustomCheckboxListTile(
           title: const Text('Short on time'),
           subtitle: const Text('Drastically reduce the initial animation.'),
           onChanged: (bool? value) {
-            print(value);
+            setBoolPreference('short-on-time', value);
           },
+          value: _shortOnTime,
         ),
       ],
     );

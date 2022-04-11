@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class SplashScreen extends StatefulWidget {
   final String text;
@@ -17,33 +18,49 @@ class _SplashScreenState extends State<SplashScreen> {
 
   late FixedExtentScrollController _controller;
 
+  void goToHomeRoute() async {
+    final preferences = await SharedPreferences.getInstance();
+
+    final bool shortOnTime = preferences.getBool('short-on-time') ?? false;
+
+    if (shortOnTime) {
+      Future.delayed(
+        const Duration(milliseconds: 750),
+        () {
+          Navigator.pushReplacementNamed(context, '/home');
+        },
+      );
+    } else {
+      final int length = widget.text.length;
+
+      Future.delayed(
+        const Duration(seconds: 1),
+        () {
+          _controller
+              .animateToItem(
+            length - 1,
+            duration: Duration(milliseconds: _scrollDurationPerLetter * length),
+            curve: Curves.easeInOutSine,
+          )
+              .then(
+            (_) {
+              Navigator.pushReplacementNamed(context, '/home');
+            },
+          );
+        },
+      );
+    }
+  }
+
   @override
   void initState() {
     super.initState();
-
-    final int length = widget.text.length;
 
     _controller = FixedExtentScrollController();
 
     WidgetsBinding.instance!.addPostFrameCallback(
       (_) {
-        Future.delayed(
-          const Duration(seconds: 1),
-          () {
-            _controller
-                .animateToItem(
-              length - 1,
-              duration:
-                  Duration(milliseconds: _scrollDurationPerLetter * length),
-              curve: Curves.easeInOutSine,
-            )
-                .then(
-              (_) {
-                Navigator.pushReplacementNamed(context, '/home');
-              },
-            );
-          },
-        );
+        goToHomeRoute();
       },
     );
   }

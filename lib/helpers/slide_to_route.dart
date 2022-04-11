@@ -10,7 +10,7 @@ PageRouteBuilder<dynamic> slideToRoute(Widget child, [Duration? duration]) {
         Animation secondaryAnimation, Widget child) {
       Offset begin = const Offset(1.0, 0.0);
       Offset end = Offset.zero;
-      Curve curve = Curves.easeOutCubic;
+      Curve curve = Curves.easeInOutCubic;
 
       Animatable<Offset> animatable = Tween(
         begin: begin,
