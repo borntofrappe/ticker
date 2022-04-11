@@ -12,26 +12,26 @@ import 'dart:ui';
 const int _digits = 10;
 
 class WheelsChangeNotifier extends ChangeNotifier {
+  bool _isSavingScrollValue = false;
   List<FixedExtentScrollController> _controllers = [];
 
-  void optionallySaveScrollValue() async {
+  void saveScrollValue() async {
     final preferences = await SharedPreferences.getInstance();
 
-    bool forgetMeNot = preferences.getBool('forget-me-not') ?? false;
-
-    if (forgetMeNot) {
-      preferences.setInt(
-        'scroll-value',
-        getScrollValue(),
-      );
-    }
+    preferences.setInt(
+      'scroll-value',
+      getScrollValue(),
+    );
   }
 
-  void initialize(List<FixedExtentScrollController> controllers) {
+  void initialize(List<FixedExtentScrollController> controllers) async {
     _controllers = [];
     for (FixedExtentScrollController controller in controllers) {
       _controllers.add(controller);
     }
+
+    final preferences = await SharedPreferences.getInstance();
+    _isSavingScrollValue = preferences.getBool('forget-me-not') ?? false;
   }
 
   void scroll(int direction) {
@@ -71,12 +71,14 @@ class WheelsChangeNotifier extends ChangeNotifier {
         ((direction == 1 && _controllers[index].selectedItem % _digits == 0) ||
             (direction == -1 && _controllers[index].selectedItem == 1)));
 
-    Future.delayed(
-      const Duration(milliseconds: scrollDuration),
-      () {
-        optionallySaveScrollValue();
-      },
-    );
+    if (_isSavingScrollValue) {
+      Future.delayed(
+        const Duration(milliseconds: scrollDuration),
+        () {
+          saveScrollValue();
+        },
+      );
+    }
   }
 
   int getScrollValue() {
@@ -128,8 +130,8 @@ class Navigation extends StatelessWidget {
   Widget build(BuildContext context) {
     return ListTile(
       trailing: CustomButton(
-        onPressed: () {
-          Navigator.pushNamed(
+        onPressed: () async {
+          final bool isSavingScrollValue = await Navigator.pushNamed(
             context,
             '/settings',
             arguments: ScreenArguments(
@@ -137,7 +139,10 @@ class Navigation extends StatelessWidget {
                   Provider.of<WheelsChangeNotifier>(context, listen: false)
                       .getScrollValue(),
             ),
-          );
+          ) as bool;
+
+          Provider.of<WheelsChangeNotifier>(context, listen: false)
+              ._isSavingScrollValue = isSavingScrollValue;
         },
         child: const Icon(
           Icons.chevron_right,

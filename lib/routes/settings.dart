@@ -15,25 +15,35 @@ class Settings extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: SafeArea(
-        child: Column(
-          children: <Widget>[
-            const Navigation(),
-            const ListTile(
-              title: Text(
-                'Ticker',
-                style: TextStyle(
-                  fontSize: 24.0,
-                  color: Colors.black87,
+      body: WillPopScope(
+        onWillPop: () async {
+          final preferences = await SharedPreferences.getInstance();
+          bool savingScrollValue =
+              preferences.getBool('forget-me-not') ?? false;
+
+          Navigator.pop(context, savingScrollValue);
+          return false;
+        },
+        child: SafeArea(
+          child: Column(
+            children: <Widget>[
+              const Navigation(),
+              const ListTile(
+                title: Text(
+                  'Ticker',
+                  style: TextStyle(
+                    fontSize: 24.0,
+                    color: Colors.black87,
+                  ),
                 ),
               ),
-            ),
-            Expanded(
-              child: Preferences(
-                scrollValue: scrollValue,
+              Expanded(
+                child: Preferences(
+                  scrollValue: scrollValue,
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
@@ -47,8 +57,12 @@ class Navigation extends StatelessWidget {
   Widget build(BuildContext context) {
     return ListTile(
       leading: CustomButton(
-        onPressed: () {
-          Navigator.pop(context);
+        onPressed: () async {
+          final preferences = await SharedPreferences.getInstance();
+          bool savingScrollValue =
+              preferences.getBool('forget-me-not') ?? false;
+
+          Navigator.pop(context, savingScrollValue);
         },
         child: const Icon(
           Icons.chevron_left,

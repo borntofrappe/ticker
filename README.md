@@ -416,3 +416,19 @@ In the home page it is then necessary to save the value as the scroll position i
 Mirroring this action, and always in the home screen, it is finally necessary to retrieve the value as the page is first created. Again this action is optional and conditional to the user having selected the desired checkbox.
 
 To compute the scroll value the process is fundamentally the opposite of the one used to set the digits based on the initial count. Start by the last column and increment a counter variable, multiplying the digit by 1, 10, 100 on the basis of the column.
+
+As a form of optimization, and instead of checking shared preferences every time the scroll takes place, initialize a boolean variable in the instance of the change notifier.
+
+```dart
+bool _isSavingScrollValue = false;
+```
+
+The goal is to then update the value in two instances:
+
+- as the home screen is first initialized, considering shared preferences
+
+- as the settings screen is popped, since the preference can change with the matching checkbox
+
+For the settings page you also need to handle when the page is removed with the back button. Flutter provides `WillPopScope`. In the `onWillPop` retrieve and return the preference as in the button included in the page.
+
+With the updated value the scrolling function needs to check the boolean instead of always referring to shared preferences.
