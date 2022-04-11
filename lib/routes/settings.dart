@@ -86,6 +86,13 @@ class Preferences extends StatelessWidget {
             print(value);
           },
         ),
+        CustomCheckboxListTile(
+          title: const Text('Short on time'),
+          subtitle: const Text('Drastically reduce the initial animation.'),
+          onChanged: (bool? value) {
+            print(value);
+          },
+        ),
       ],
     );
   }

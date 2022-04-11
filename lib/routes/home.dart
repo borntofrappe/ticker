@@ -197,7 +197,8 @@ class _WheelsState extends State<Wheels> {
 
   @override
   Widget build(BuildContext context) {
-    const double margin = 4.0;
+    const double margin = 6.0;
+    const double borderWidth = 4.0;
 
     Provider.of<WheelsChangeNotifier>(context, listen: false)
         .initialize(_controllers);
@@ -226,6 +227,7 @@ class _WheelsState extends State<Wheels> {
                         margin: const EdgeInsets.symmetric(horizontal: margin),
                         child: Wheel(
                           itemExtent: itemExtent,
+                          borderWidth: borderWidth,
                           controller: controller,
                         ),
                       ),
@@ -242,11 +244,13 @@ class _WheelsState extends State<Wheels> {
 
 class Wheel extends StatelessWidget {
   final double itemExtent;
+  final double borderWidth;
   final FixedExtentScrollController controller;
 
   const Wheel({
     Key? key,
     required this.itemExtent,
+    required this.borderWidth,
     required this.controller,
   }) : super(key: key);
 
@@ -272,7 +276,7 @@ class Wheel extends StatelessWidget {
               itemExtent: itemExtent,
               children: <Widget>[
                 Item(
-                  borderWidth: itemExtent * 0.04,
+                  borderWidth: borderWidth,
                 ),
               ],
             ),
@@ -338,18 +342,16 @@ class Buttons extends StatelessWidget {
               Provider.of<WheelsChangeNotifier>(context, listen: false)
                   .scroll(-1);
             },
-            child: const AspectRatio(
-              aspectRatio: 1.0,
-              child: FittedBox(
-                child: Text(
-                  '-',
-                  style: TextStyle(
-                    color: Colors.black87,
-                    fontWeight: FontWeight.bold,
-                    fontFeatures: [
-                      FontFeature.caseSensitiveForms(),
-                    ],
-                  ),
+            child: const FittedBox(
+              child: Text(
+                '-',
+                style: TextStyle(
+                  color: Colors.black87,
+                  fontSize: 64.0,
+                  fontWeight: FontWeight.bold,
+                  fontFeatures: [
+                    FontFeature.caseSensitiveForms(),
+                  ],
                 ),
               ),
             ),
@@ -363,18 +365,16 @@ class Buttons extends StatelessWidget {
               Provider.of<WheelsChangeNotifier>(context, listen: false)
                   .scroll(1);
             },
-            child: const AspectRatio(
-              aspectRatio: 1.0,
-              child: FittedBox(
-                child: Text(
-                  '+',
-                  style: TextStyle(
-                    color: Colors.black87,
-                    fontWeight: FontWeight.bold,
-                    fontFeatures: [
-                      FontFeature.caseSensitiveForms(),
-                    ],
-                  ),
+            child: const FittedBox(
+              child: Text(
+                '+',
+                style: TextStyle(
+                  color: Colors.black87,
+                  fontSize: 64.0,
+                  fontWeight: FontWeight.bold,
+                  fontFeatures: [
+                    FontFeature.caseSensitiveForms(),
+                  ],
                 ),
               ),
             ),

@@ -20,26 +20,30 @@ class CustomButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return OutlinedButton(
-      style: ButtonStyle(
-        padding: MaterialStateProperty.all(EdgeInsets.zero),
-        minimumSize: MaterialStateProperty.all(Size(size, size)),
-        maximumSize: MaterialStateProperty.all(Size(size, size)),
-        shape: MaterialStateProperty.all(const BeveledRectangleBorder()),
-        side: MaterialStateProperty.all(
-          BorderSide(
-            color: color,
-            width: borderWidth,
+    return SizedBox(
+      width: size,
+      height: size,
+      child: OutlinedButton(
+        style: ButtonStyle(
+          padding: MaterialStateProperty.all(EdgeInsets.zero),
+          shape: MaterialStateProperty.all(const BeveledRectangleBorder()),
+          side: MaterialStateProperty.all(
+            BorderSide(
+              color: color,
+              width: borderWidth,
+            ),
+          ),
+          overlayColor: MaterialStateProperty.resolveWith(
+            (states) {
+              return states.contains(MaterialState.pressed)
+                  ? overlayColor
+                  : null;
+            },
           ),
         ),
-        overlayColor: MaterialStateProperty.resolveWith(
-          (states) {
-            return states.contains(MaterialState.pressed) ? overlayColor : null;
-          },
-        ),
+        child: child,
+        onPressed: onPressed,
       ),
-      child: child,
-      onPressed: onPressed,
     );
   }
 }

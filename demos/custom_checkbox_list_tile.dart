@@ -58,10 +58,10 @@ class CustomCheckboxListTile extends StatefulWidget {
   }) : super(key: key);
 
   @override
-  State<CustomCheckboxListTile> createState() => _CustomCheckboxState();
+  State<CustomCheckboxListTile> createState() => _CustomCheckboxListTileState();
 }
 
-class _CustomCheckboxState extends State<CustomCheckboxListTile> {
+class _CustomCheckboxListTileState extends State<CustomCheckboxListTile> {
   bool _value = false;
 
   @override
