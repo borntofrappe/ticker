@@ -58,6 +58,10 @@ In the settings page the application allows to customize preferences with severa
 
 Out of preference I've chosen to remove the overlay color.
 
+### custom_checkbox_list_tile
+
+In the settings page the checkbox is actually slotted in a list tile. Following the example of `CheckboxListTile` the demo shows how I intend to expand `CustomCheckbox` so that the toggle functionality is enabled by pressing the button _or_ by tapping the parent container.
+
 ### infinite_wheel
 
 The wheels are ultimately managed with a controller. The demo shows how to implement the wheel always showing numbers in a given range — 0 to 9 — in two possible ways:
