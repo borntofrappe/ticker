@@ -62,6 +62,10 @@ Out of preference I've chosen to remove the overlay color.
 
 In the settings page the checkbox is actually slotted in a list tile. Following the example of `CheckboxListTile` the demo shows how I intend to expand `CustomCheckbox` so that the toggle functionality is enabled by pressing the button _or_ by tapping the parent container.
 
+### custom_range_list_tile
+
+In the settings page allow to change the number of columns by tapping on a counter button. To mirror the design of the other preferences add the button in a `ListTile` widget and change the value in a given range.
+
 ### infinite_wheel
 
 The wheels are ultimately managed with a controller. The demo shows how to implement the wheel always showing numbers in a given range — 0 to 9 — in two possible ways:
