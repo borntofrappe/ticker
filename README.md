@@ -28,44 +28,6 @@ _Please note:_ in the demo the wheel for the border precedes the one dedicated t
 
 As prefaced in the demo devoted to a single wheel the goal is to update the wheels with two separate buttons. It is possible to create a single giant widget which renders the wheel _and_ button in the same `build` method, managing the logic for both, but it is ultimately helpful to break the application into multiple widgets. In this instance the change notifier helps to update the interface from the separate location.
 
-### splash_screen
-
-As a form of splash screen the goal is to show the name of the application with a similar design as the one implemented for the digits.
-
-Instead of moving the letters top to bottom, however, the idea is to have the animation side to side. This helps to perceive the letters and mirrors how the application will then move to the settings page — refer to the `slideToRoute` demo.
-
-For the horizontal wheel rotate the entire list a quarter turn back, the list items a quarter turn forward to keep them straight up.
-
-### slideToRoute
-
-Past the splash screen the application is meant to have two screens, home page and settings. To move to and from the settings' page the goal is to have the visual slide from the right side, explaining the need for a custom page builder.
-
-`slideToRoute` returns an instance of `PageRouteBuilder`. Once you have the function define the transition in the `onGenerateRoute` field of the material application and for the prescribed route.
-
-The builder is used as the application uses `Navigator.pushNamed`.
-
-### custom_button
-
-The application relies on several buttons to update the counter, move to the settings page and again update the application's preferences. To mirror the design of the wheels the goal is to have squared buttons with a rectangular border.
-
-It is possible to implement the design with and `ElevatedButton` or again with an `OutlinedButton`, and the demo shows how. The choice between the two is debatable. The material API describes elevated button as a primary button, with the biggest emphasis. Is the connotation purely a matter of design or semantics? Should primary buttons be elevated, secondary buttons outlined? Since the design of the buttons in the application is the same for all buttons it might be acceptable to rely on a single widget.
-
-In terms of implementation I lean toward outlined button, since the widget has a border by default and requires less code to change the starting assumptions — see elevation and shadow color.
-
-### custom_checkbox
-
-In the settings page the application allows to customize preferences with several widgets, among which a checkbox to save the counter locally. It would be possible to use a `Switch` or `Checkbox` widget, but I ultimately prefer to follow the example and design of the custom button. The demo shows how to implement a toggle with a stateful widget which renders the child widget pending a boolean condition. The widget also receives a function which is called with the updated value, so that ultimately the parent widget is able to enact the desired feature.
-
-Out of preference I've chosen to remove the overlay color.
-
-### custom_checkbox_list_tile
-
-In the settings page the checkbox is actually slotted in a list tile. Following the example of `CheckboxListTile` the demo shows how I intend to expand `CustomCheckbox` so that the toggle functionality is enabled by pressing the button _or_ by tapping the parent container.
-
-### custom_range_list_tile
-
-In the settings page allow to change the number of columns by tapping on a counter button. To mirror the design of the other preferences add the button in a `ListTile` widget and change the value in a given range.
-
 ### infinite_wheel
 
 The wheels are ultimately managed with a controller. The demo shows how to implement the wheel always showing numbers in a given range — 0 to 9 — in two possible ways:
@@ -89,6 +51,42 @@ Display the selected item to debug the interfance.
 ```dart
 print(_controller.selectedItem);
 ```
+
+### splash_screen
+
+As a form of splash screen the goal is to show the name of the application with a similar design as the one implemented for the digits.
+
+Instead of moving the letters top to bottom, however, the idea is to have the animation side to side. This helps to perceive the letters and mirrors how the application will then move to the settings page — refer to the `slideToRoute` demo.
+
+For the horizontal wheel rotate the entire list a quarter turn back, the list items a quarter turn forward to keep them straight up.
+
+### slideToRoute
+
+Past the splash screen the application is meant to have two screens, home page and settings. To move to and from the settings' page the goal is to have the visual slide from the right side, explaining the need for a custom page builder.
+
+`slideToRoute` returns an instance of `PageRouteBuilder`. Once you have the function define the transition in the `onGenerateRoute` field of the material application and for the prescribed route.
+
+The builder is used as the application uses `Navigator.pushNamed`.
+
+### custom_button
+
+The application relies on several buttons to update the counter, move to the settings page and again update the application's preferences. To mirror the design of the wheels' digits the goal is to have squared buttons with a solid border.
+
+The demo shows how to implement the desired design with an `OutlinedButton` and the `style` property. The widget tree should allow to include an icon or text widget as a child, expanding the size of either visual to the container's size. If you need a smaller visual wrap the `child` in a `Padding` widget.
+
+_Please note:_ the demo uses the color from the theme for the color of the border, but **not** for the color of the text or icon. The style of these last two elements is outside of the scope of the button.
+
+### custom_checkbox
+
+In the settings page the application allows to customize preferences with several widgets, among which a checkbox to save the counter locally. The goal of the demo is to show how to use the custom button designed for the application to toggle between the two options. The widget also receives a function which is called with the updated value, so that ultimately the parent widget is able to enact the desired feature.
+
+### custom_checkbox_list_tile
+
+In the settings page the checkbox is actually slotted in a list tile. The demo shows how to fit the custom button in a `ListTile` fabricating a similar solution to `CheckboxListTile`. The functionality of the checkbox is associated with a press on the button or a tap on the list tile.
+
+### custom_range_list_tile
+
+In the settings page one of the options allows to change the number of column by tapping on a counter button. The demo shows how to fit the custom button in a `ListTile` widget and update the child to show the desired number.
 
 ## App
 
