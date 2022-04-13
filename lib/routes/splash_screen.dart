@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'package:ticker/helpers/screen_arguments.dart';
+
 class SplashScreen extends StatefulWidget {
   final String text;
   const SplashScreen({
@@ -15,26 +17,41 @@ class SplashScreen extends StatefulWidget {
 class _SplashScreenState extends State<SplashScreen> {
   static const double _itemExtent = 200.0;
   static const int _scrollDurationPerLetter = 320;
+  static const int _scrollDelay = 1000;
 
   late FixedExtentScrollController _controller;
 
-  void goToHomeRoute() async {
+  void _goToHomeRoute() async {
+    final preferences = await SharedPreferences.getInstance();
+    bool forgetMeNot = preferences.getBool('forget-me-not') ?? false;
+    int scrollValue = forgetMeNot ? preferences.getInt('scroll-value') ?? 0 : 0;
+
+    Navigator.pushReplacementNamed(
+      context,
+      '/home',
+      arguments: ScreenArguments(
+        scrollValue: scrollValue,
+      ),
+    );
+  }
+
+  void _handleSplashAnimation() async {
     final preferences = await SharedPreferences.getInstance();
 
     final bool shortOnTime = preferences.getBool('short-on-time') ?? false;
 
     if (shortOnTime) {
       Future.delayed(
-        const Duration(milliseconds: 750),
+        const Duration(milliseconds: _scrollDelay),
         () {
-          Navigator.pushReplacementNamed(context, '/home');
+          _goToHomeRoute();
         },
       );
     } else {
       final int length = widget.text.length;
 
       Future.delayed(
-        const Duration(seconds: 1),
+        const Duration(milliseconds: _scrollDelay),
         () {
           _controller
               .animateToItem(
@@ -44,7 +61,7 @@ class _SplashScreenState extends State<SplashScreen> {
           )
               .then(
             (_) {
-              Navigator.pushReplacementNamed(context, '/home');
+              _goToHomeRoute();
             },
           );
         },
@@ -60,7 +77,7 @@ class _SplashScreenState extends State<SplashScreen> {
 
     WidgetsBinding.instance!.addPostFrameCallback(
       (_) {
-        goToHomeRoute();
+        _handleSplashAnimation();
       },
     );
   }
@@ -74,6 +91,8 @@ class _SplashScreenState extends State<SplashScreen> {
 
   @override
   Widget build(BuildContext context) {
+    const double borderWidth = 8.0;
+
     return Scaffold(
       body: Center(
         child: Stack(
@@ -116,7 +135,7 @@ class _SplashScreenState extends State<SplashScreen> {
                     child: Container(
                       decoration: BoxDecoration(
                         border: Border.all(
-                          width: 8.0,
+                          width: borderWidth,
                           color: Theme.of(context).primaryColor,
                         ),
                       ),

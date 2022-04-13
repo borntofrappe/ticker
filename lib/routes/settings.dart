@@ -18,10 +18,9 @@ class Settings extends StatelessWidget {
       body: WillPopScope(
         onWillPop: () async {
           final preferences = await SharedPreferences.getInstance();
-          bool savingScrollValue =
-              preferences.getBool('forget-me-not') ?? false;
+          bool forgetMeNot = preferences.getBool('forget-me-not') ?? false;
 
-          Navigator.pop(context, savingScrollValue);
+          Navigator.pop(context, forgetMeNot);
           return false;
         },
         child: SafeArea(
@@ -59,10 +58,9 @@ class Navigation extends StatelessWidget {
       leading: CustomButton(
         onPressed: () async {
           final preferences = await SharedPreferences.getInstance();
-          bool savingScrollValue =
-              preferences.getBool('forget-me-not') ?? false;
+          bool forgetMeNot = preferences.getBool('forget-me-not') ?? false;
 
-          Navigator.pop(context, savingScrollValue);
+          Navigator.pop(context, forgetMeNot);
         },
         child: const Icon(
           Icons.chevron_left,

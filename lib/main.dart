@@ -19,6 +19,7 @@ class App extends StatelessWidget {
     return MaterialApp(
       theme: ThemeData(
         primaryColor: Colors.black87,
+        highlightColor: Colors.black12,
         fontFamily: 'Inter',
       ),
       home: const SplashScreen(
@@ -26,11 +27,13 @@ class App extends StatelessWidget {
       ),
       onGenerateRoute: (RouteSettings settings) {
         if (settings.name == '/home') {
+          const int slideDuration = 1000;
+          final args = settings.arguments as ScreenArguments;
           return slideToRoute(
-            const Home(),
-            const Duration(
-              seconds: 1,
+            Home(
+              scrollValue: args.scrollValue,
             ),
+            slideDuration,
           );
         } else if (settings.name == '/settings') {
           final args = settings.arguments as ScreenArguments;

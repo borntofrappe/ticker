@@ -11,27 +11,18 @@ import 'dart:ui';
 
 const int _digits = 10;
 
-class WheelsChangeNotifier extends ChangeNotifier {
-  bool _isSavingScrollValue = false;
+class HomeChangeNotifier extends ChangeNotifier {
+  bool _forgetMeNot = false;
   List<FixedExtentScrollController> _controllers = [];
 
-  void saveScrollValue() async {
-    final preferences = await SharedPreferences.getInstance();
-
-    preferences.setInt(
-      'scroll-value',
-      getScrollValue(),
-    );
-  }
-
-  void initialize(List<FixedExtentScrollController> controllers) async {
+  void init(List<FixedExtentScrollController> controllers) async {
     _controllers = [];
     for (FixedExtentScrollController controller in controllers) {
       _controllers.add(controller);
     }
 
     final preferences = await SharedPreferences.getInstance();
-    _isSavingScrollValue = preferences.getBool('forget-me-not') ?? false;
+    _forgetMeNot = preferences.getBool('forget-me-not') ?? false;
   }
 
   void scroll(int direction) {
@@ -71,7 +62,7 @@ class WheelsChangeNotifier extends ChangeNotifier {
         ((direction == 1 && _controllers[index].selectedItem % _digits == 0) ||
             (direction == -1 && _controllers[index].selectedItem == 1)));
 
-    if (_isSavingScrollValue) {
+    if (_forgetMeNot) {
       Future.delayed(
         const Duration(milliseconds: scrollDuration),
         () {
@@ -79,6 +70,15 @@ class WheelsChangeNotifier extends ChangeNotifier {
         },
       );
     }
+  }
+
+  void saveScrollValue() async {
+    final preferences = await SharedPreferences.getInstance();
+
+    preferences.setInt(
+      'scroll-value',
+      getScrollValue(),
+    );
   }
 
   int getScrollValue() {
@@ -96,22 +96,28 @@ class WheelsChangeNotifier extends ChangeNotifier {
 }
 
 class Home extends StatelessWidget {
-  const Home({Key? key}) : super(key: key);
+  final int scrollValue;
+  const Home({
+    Key? key,
+    required this.scrollValue,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: SafeArea(
         child: ChangeNotifierProvider(
-          create: (_) => WheelsChangeNotifier(),
+          create: (_) => HomeChangeNotifier(),
           child: Column(
-            children: const <Widget>[
-              Navigation(),
+            children: <Widget>[
+              const Navigation(),
               Expanded(
                 flex: 3,
-                child: Wheels(),
+                child: Wheels(
+                  scrollValue: scrollValue,
+                ),
               ),
-              Expanded(
+              const Expanded(
                 flex: 2,
                 child: Buttons(),
               ),
@@ -131,18 +137,18 @@ class Navigation extends StatelessWidget {
     return ListTile(
       trailing: CustomButton(
         onPressed: () async {
-          final bool isSavingScrollValue = await Navigator.pushNamed(
+          final bool forgetMeNot = await Navigator.pushNamed(
             context,
             '/settings',
             arguments: ScreenArguments(
               scrollValue:
-                  Provider.of<WheelsChangeNotifier>(context, listen: false)
+                  Provider.of<HomeChangeNotifier>(context, listen: false)
                       .getScrollValue(),
             ),
           ) as bool;
 
-          Provider.of<WheelsChangeNotifier>(context, listen: false)
-              ._isSavingScrollValue = isSavingScrollValue;
+          Provider.of<HomeChangeNotifier>(context, listen: false)._forgetMeNot =
+              forgetMeNot;
         },
         child: const Icon(
           Icons.chevron_right,
@@ -160,10 +166,12 @@ class Navigation extends StatelessWidget {
 
 class Wheels extends StatefulWidget {
   final int count;
+  final int scrollValue;
 
   const Wheels({
     Key? key,
     this.count = 3,
+    this.scrollValue = 0,
   }) : super(key: key);
 
   @override
@@ -172,24 +180,6 @@ class Wheels extends StatefulWidget {
 
 class _WheelsState extends State<Wheels> {
   List<FixedExtentScrollController> _controllers = [];
-
-  void _optionallyGetScrollValue() async {
-    final preferences = await SharedPreferences.getInstance();
-
-    bool forgetMeNot = preferences.getBool('forget-me-not') ?? false;
-
-    if (forgetMeNot) {
-      int value = preferences.getInt('scroll-value') ?? 0;
-      if (value > 0) {
-        Future.delayed(
-          const Duration(seconds: 1),
-          () {
-            _scrollTo(value);
-          },
-        );
-      }
-    }
-  }
 
   @override
   void initState() {
@@ -200,11 +190,17 @@ class _WheelsState extends State<Wheels> {
       (_) => FixedExtentScrollController(),
     );
 
-    WidgetsBinding.instance?.addPostFrameCallback(
-      (_) {
-        _optionallyGetScrollValue();
-      },
-    );
+    int scrollValue = widget.scrollValue;
+    if (scrollValue > 0) {
+      const int scrollDelay = 750;
+
+      Future.delayed(
+        const Duration(milliseconds: scrollDelay),
+        () {
+          _scrollTo(scrollValue);
+        },
+      );
+    }
   }
 
   @override
@@ -216,7 +212,8 @@ class _WheelsState extends State<Wheels> {
     super.dispose();
   }
 
-  void _scrollTo(value) {
+  void _scrollTo(scrollValue) {
+    int value = scrollValue;
     int duration = 2000 ~/ _controllers.length;
     int delay = 0;
 
@@ -252,8 +249,7 @@ class _WheelsState extends State<Wheels> {
     const double margin = 6.0;
     const double borderWidth = 4.0;
 
-    Provider.of<WheelsChangeNotifier>(context, listen: false)
-        .initialize(_controllers);
+    Provider.of<HomeChangeNotifier>(context, listen: false).init(_controllers);
 
     return LayoutBuilder(
       builder: (BuildContext context, BoxConstraints constraints) {
@@ -391,7 +387,7 @@ class Buttons extends StatelessWidget {
         children: <Widget>[
           CustomButton(
             onPressed: () {
-              Provider.of<WheelsChangeNotifier>(context, listen: false)
+              Provider.of<HomeChangeNotifier>(context, listen: false)
                   .scroll(-1);
             },
             child: const FittedBox(
@@ -414,8 +410,7 @@ class Buttons extends StatelessWidget {
           ),
           CustomButton(
             onPressed: () {
-              Provider.of<WheelsChangeNotifier>(context, listen: false)
-                  .scroll(1);
+              Provider.of<HomeChangeNotifier>(context, listen: false).scroll(1);
             },
             child: const FittedBox(
               child: Text(
