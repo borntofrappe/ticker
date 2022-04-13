@@ -12,6 +12,7 @@ class App extends StatelessWidget {
     return MaterialApp(
       theme: ThemeData(
         primaryColor: Colors.black87,
+        highlightColor: Colors.black12,
       ),
       home: const Home(),
     );
@@ -26,20 +27,9 @@ class Home extends StatelessWidget {
     return Scaffold(
       body: Center(
         child: CustomCheckbox(
-          value: true,
-          onChanged: (bool? value) {
+          onChanged: (bool value) {
             print(value);
           },
-          child: const Center(
-            child: Icon(
-              Icons.close,
-              size: 28.0,
-              color: Colors.black87,
-            ),
-          ),
-          size: 32.0,
-          color: Colors.black87,
-          borderWidth: 1.0,
         ),
       ),
     );
@@ -47,21 +37,21 @@ class Home extends StatelessWidget {
 }
 
 class CustomCheckbox extends StatefulWidget {
-  final bool value;
   final Function onChanged;
-  final Widget child;
-  final double size;
-  final Color color;
+  final bool value;
+  final double checkboxSize;
+  final double iconSize;
   final double borderWidth;
+  final IconData icon;
 
   const CustomCheckbox({
     Key? key,
-    this.value = false,
     required this.onChanged,
-    required this.child,
-    required this.size,
-    required this.color,
-    required this.borderWidth,
+    this.value = false,
+    this.checkboxSize = 24.0,
+    this.iconSize = 18.0,
+    this.borderWidth = 1.0,
+    this.icon = Icons.close,
   }) : super(key: key);
 
   @override
@@ -80,31 +70,91 @@ class _CustomCheckboxState extends State<CustomCheckbox> {
     });
   }
 
+  void _updateValue() {
+    setState(
+      () {
+        _value = !_value;
+      },
+    );
+    widget.onChanged(_value);
+  }
+
   @override
   Widget build(BuildContext context) {
-    double size = widget.size;
+    double checkboxSize = widget.checkboxSize;
+    double iconSize = widget.iconSize;
+    double borderWidth = widget.borderWidth;
+    IconData icon = widget.icon;
 
-    return OutlinedButton(
-      style: ButtonStyle(
-        padding: MaterialStateProperty.all(EdgeInsets.zero),
-        minimumSize: MaterialStateProperty.all(Size(size, size)),
-        maximumSize: MaterialStateProperty.all(Size(size, size)),
-        shape: MaterialStateProperty.all(const BeveledRectangleBorder()),
-        side: MaterialStateProperty.all(
-          BorderSide(
-            color: widget.color,
-            width: widget.borderWidth,
+    return CustomButton(
+      onPressed: () {
+        _updateValue();
+      },
+      child: _value
+          ? Padding(
+              padding: EdgeInsets.all((checkboxSize - iconSize) / 2),
+              child: Icon(
+                icon,
+                color: Theme.of(context).primaryColor,
+              ),
+            )
+          : Container(),
+      size: checkboxSize,
+      borderWidth: borderWidth,
+      showOverlay: false,
+    );
+  }
+}
+
+class CustomButton extends StatelessWidget {
+  final VoidCallback onPressed;
+  final Widget child;
+  final double size;
+  final double borderWidth;
+  final bool showOverlay;
+
+  const CustomButton({
+    Key? key,
+    required this.onPressed,
+    required this.child,
+    required this.size,
+    required this.borderWidth,
+    this.showOverlay = true,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      width: size,
+      height: size,
+      child: OutlinedButton(
+        onPressed: onPressed,
+        child: AspectRatio(
+          aspectRatio: 1.0,
+          child: FittedBox(
+            child: child,
           ),
         ),
-        overlayColor: MaterialStateProperty.all(Colors.transparent),
+        style: ButtonStyle(
+          padding: MaterialStateProperty.all(EdgeInsets.zero),
+          shape: MaterialStateProperty.all(const BeveledRectangleBorder()),
+          side: MaterialStateProperty.all(
+            BorderSide(
+              color: Theme.of(context).primaryColor,
+              width: borderWidth,
+            ),
+          ),
+          overlayColor: showOverlay
+              ? MaterialStateProperty.resolveWith(
+                  (states) {
+                    return states.contains(MaterialState.pressed)
+                        ? Theme.of(context).highlightColor
+                        : null;
+                  },
+                )
+              : MaterialStateProperty.all(Colors.transparent),
+        ),
       ),
-      child: _value ? widget.child : Container(),
-      onPressed: () {
-        setState(() {
-          _value = !_value;
-          widget.onChanged(_value);
-        });
-      },
     );
   }
 }
