@@ -12,6 +12,7 @@ class App extends StatelessWidget {
     return MaterialApp(
       theme: ThemeData(
         primaryColor: Colors.black87,
+        highlightColor: Colors.black12,
       ),
       home: const Home(),
     );
@@ -24,98 +25,27 @@ class Home extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: SafeArea(
+      body: Center(
         child: Column(
+          mainAxisSize: MainAxisSize.min,
           children: <Widget>[
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: const <Widget>[
-                Text('Outlined button with text'),
-                CustomOutlinedButton(
-                  child: AspectRatio(
-                    aspectRatio: 1.0,
-                    child: FittedBox(
-                      child: Text(
-                        '+',
-                        style: TextStyle(
-                          color: Colors.black87,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ),
-                  ),
-                  size: 64.0,
-                  color: Colors.black87,
-                  overlayColor: Colors.black12,
-                  borderWidth: 2.0,
-                ),
-              ],
+            CustomButton(
+              onPressed: () {},
+              child: const Text(
+                '+',
+              ),
+              size: 64.0,
+              borderWidth: 2.0,
             ),
-            const SizedBox(height: 8.0),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: const <Widget>[
-                Text('Outlined button with icon'),
-                CustomOutlinedButton(
-                  child: Icon(
-                    Icons.chevron_right,
-                    size: 32.0,
-                    color: Colors.black87,
-                  ),
-                  size: 32.0,
-                  color: Colors.black87,
-                  overlayColor: Colors.black12,
-                  borderWidth: 1.0,
-                ),
-              ],
-            ),
-            const SizedBox(height: 32.0),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: const <Widget>[
-                Text('Elevated button with text'),
-                CustomElevatedButton(
-                  child: AspectRatio(
-                    aspectRatio: 1.0,
-                    child: FittedBox(
-                      child: Text(
-                        '+',
-                        style: TextStyle(
-                          color: Colors.black87,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ),
-                  ),
-                  size: 64.0,
-                  color: Colors.black87,
-                  overlayColor: Colors.black12,
-                  borderWidth: 2.0,
-                ),
-              ],
-            ),
-            const SizedBox(height: 8.0),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: const <Widget>[
-                Text('Elevated button with icon'),
-                CustomElevatedButton(
-                  child: AspectRatio(
-                    aspectRatio: 1.0,
-                    child: FittedBox(
-                      child: Icon(
-                        Icons.chevron_right,
-                        size: 32.0,
-                        color: Colors.black87,
-                      ),
-                    ),
-                  ),
-                  size: 32.0,
-                  color: Colors.black87,
-                  overlayColor: Colors.black12,
-                  borderWidth: 1.0,
-                ),
-              ],
+            const SizedBox(height: 16.0),
+            CustomButton(
+              onPressed: () {},
+              child: const Icon(
+                Icons.chevron_right,
+              ),
+              size: 32.0,
+              borderWidth: 1.0,
+              showOverlay: false,
             ),
           ],
         ),
@@ -124,20 +54,20 @@ class Home extends StatelessWidget {
   }
 }
 
-class CustomOutlinedButton extends StatelessWidget {
+class CustomButton extends StatelessWidget {
+  final VoidCallback onPressed;
   final Widget child;
   final double size;
-  final Color color;
-  final Color overlayColor;
   final double borderWidth;
+  final bool showOverlay;
 
-  const CustomOutlinedButton({
+  const CustomButton({
     Key? key,
+    required this.onPressed,
     required this.child,
     required this.size,
-    required this.color,
-    required this.overlayColor,
     required this.borderWidth,
+    this.showOverlay = true,
   }) : super(key: key);
 
   @override
@@ -146,81 +76,32 @@ class CustomOutlinedButton extends StatelessWidget {
       width: size,
       height: size,
       child: OutlinedButton(
+        onPressed: onPressed,
+        child: AspectRatio(
+          aspectRatio: 1.0,
+          child: FittedBox(
+            child: child,
+          ),
+        ),
         style: ButtonStyle(
           padding: MaterialStateProperty.all(EdgeInsets.zero),
           shape: MaterialStateProperty.all(const BeveledRectangleBorder()),
           side: MaterialStateProperty.all(
             BorderSide(
-              color: color,
+              color: Theme.of(context).primaryColor,
               width: borderWidth,
             ),
           ),
-          overlayColor: MaterialStateProperty.resolveWith(
-            (states) {
-              return states.contains(MaterialState.pressed)
-                  ? overlayColor
-                  : null;
-            },
-          ),
+          overlayColor: showOverlay
+              ? MaterialStateProperty.resolveWith(
+                  (states) {
+                    return states.contains(MaterialState.pressed)
+                        ? Theme.of(context).highlightColor
+                        : null;
+                  },
+                )
+              : MaterialStateProperty.all(Colors.transparent),
         ),
-        child: child,
-        onPressed: () {
-          // worth it?
-        },
-      ),
-    );
-  }
-}
-
-class CustomElevatedButton extends StatelessWidget {
-  final Widget child;
-  final double size;
-  final Color color;
-  final Color overlayColor;
-  final double borderWidth;
-
-  const CustomElevatedButton({
-    Key? key,
-    required this.child,
-    required this.size,
-    required this.color,
-    required this.overlayColor,
-    required this.borderWidth,
-  }) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return SizedBox(
-      width: size,
-      height: size,
-      child: ElevatedButton(
-        style: ButtonStyle(
-          padding: MaterialStateProperty.all(EdgeInsets.zero),
-          backgroundColor: MaterialStateProperty.all(Colors.transparent),
-          shadowColor: MaterialStateProperty.all(Colors.transparent),
-          elevation: MaterialStateProperty.all(0.0),
-          overlayColor: MaterialStateProperty.resolveWith(
-            (states) {
-              return states.contains(MaterialState.pressed)
-                  ? overlayColor
-                  : null;
-            },
-          ),
-        ),
-        child: Container(
-          decoration: BoxDecoration(
-            border: Border.all(
-              color: color,
-              width: borderWidth,
-            ),
-          ),
-          width: size,
-          height: size,
-          child: child,
-        ),
-        onPressed: () {
-          // worth it?
-        },
       ),
     );
   }
