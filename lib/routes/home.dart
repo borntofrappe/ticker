@@ -97,9 +97,11 @@ class HomeChangeNotifier extends ChangeNotifier {
 
 class Home extends StatelessWidget {
   final int scrollValue;
+  final int count;
   const Home({
     Key? key,
     required this.scrollValue,
+    required this.count,
   }) : super(key: key);
 
   @override
@@ -115,6 +117,7 @@ class Home extends StatelessWidget {
                 flex: 3,
                 child: Wheels(
                   scrollValue: scrollValue,
+                  count: count,
                 ),
               ),
               const Expanded(
@@ -137,6 +140,9 @@ class Navigation extends StatelessWidget {
     return ListTile(
       trailing: CustomButton(
         onPressed: () async {
+          final preferences = await SharedPreferences.getInstance();
+          int count = preferences.getInt('count') ?? 3;
+
           final bool forgetMeNot = await Navigator.pushNamed(
             context,
             '/settings',
@@ -144,6 +150,7 @@ class Navigation extends StatelessWidget {
               scrollValue:
                   Provider.of<HomeChangeNotifier>(context, listen: false)
                       .getScrollValue(),
+              count: count,
             ),
           ) as bool;
 

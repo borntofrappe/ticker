@@ -25,12 +25,14 @@ class _SplashScreenState extends State<SplashScreen> {
     final preferences = await SharedPreferences.getInstance();
     bool forgetMeNot = preferences.getBool('forget-me-not') ?? false;
     int scrollValue = forgetMeNot ? preferences.getInt('scroll-value') ?? 0 : 0;
+    int count = preferences.getInt('count') ?? 3;
 
     Navigator.pushReplacementNamed(
       context,
       '/home',
       arguments: ScreenArguments(
         scrollValue: scrollValue,
+        count: count,
       ),
     );
   }

@@ -32,6 +32,7 @@ class App extends StatelessWidget {
           return slideToRoute(
             Home(
               scrollValue: args.scrollValue,
+              count: args.count,
             ),
             slideDuration,
           );
@@ -40,6 +41,7 @@ class App extends StatelessWidget {
           return slideToRoute(
             Settings(
               scrollValue: args.scrollValue,
+              count: args.count,
             ),
           );
         }

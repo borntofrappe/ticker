@@ -3,15 +3,18 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:ticker/widgets/custom_button.dart';
 import 'package:ticker/widgets/custom_checkbox_list_tile.dart';
+import 'package:ticker/widgets/custom_range_list_tile.dart';
 
 import 'package:ticker/helpers/screen_arguments.dart';
 
 class Settings extends StatelessWidget {
   final int scrollValue;
+  final int count;
 
   const Settings({
     Key? key,
     this.scrollValue = 0,
+    this.count = 3,
   }) : super(key: key);
 
   @override
@@ -41,6 +44,7 @@ class Settings extends StatelessWidget {
               Expanded(
                 child: Preferences(
                   scrollValue: scrollValue,
+                  count: count,
                 ),
               ),
             ],
@@ -76,6 +80,7 @@ class Navigation extends StatelessWidget {
           final preferences = await SharedPreferences.getInstance();
 
           bool forgetMeNot = preferences.getBool('forget-me-not') ?? false;
+          int count = preferences.getInt('count') ?? 3;
 
           if (forgetMeNot) {
             preferences.setInt('scroll-value', 0);
@@ -87,6 +92,7 @@ class Navigation extends StatelessWidget {
             (Route<dynamic> route) => false,
             arguments: ScreenArguments(
               scrollValue: 0,
+              count: count,
             ),
           );
         },
@@ -103,10 +109,12 @@ class Navigation extends StatelessWidget {
 
 class Preferences extends StatefulWidget {
   final int scrollValue;
+  final int count;
 
   const Preferences({
     Key? key,
     required this.scrollValue,
+    required this.count,
   }) : super(key: key);
 
   @override
@@ -116,6 +124,7 @@ class Preferences extends StatefulWidget {
 class _PreferencesState extends State<Preferences> {
   bool _shortOnTime = false;
   bool _forgetMeNot = false;
+  int _count = 1;
 
   @override
   void initState() {
@@ -130,6 +139,7 @@ class _PreferencesState extends State<Preferences> {
       () {
         _shortOnTime = preferences.getBool('short-on-time') ?? false;
         _forgetMeNot = preferences.getBool('forget-me-not') ?? false;
+        _count = preferences.getInt('count') ?? 3;
       },
     );
   }
@@ -164,6 +174,14 @@ class _PreferencesState extends State<Preferences> {
             ),
           ),
         ),
+        CustomRangeListTile(
+          min: 1,
+          max: 5,
+          value: _count,
+          onChanged: (int value) {
+            setIntPreference('count', value);
+          },
+        ),
         CustomCheckboxListTile(
           onChanged: (bool? value) {
             setBoolPreference('forget-me-not', value);
@@ -175,7 +193,7 @@ class _PreferencesState extends State<Preferences> {
           },
           value: _forgetMeNot,
           title: const Text('Forget me not'),
-          subtitle: const Text('Save your number for the next time.'),
+          subtitle: const Text('Save your counter for the next time.'),
         ),
         CustomCheckboxListTile(
           onChanged: (bool? value) {
