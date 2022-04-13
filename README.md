@@ -328,7 +328,7 @@ In terms of design add an icon to move back to the home screen, a list tile with
 
 Include the app preferences in a `ListView` widget with a series of dedicated components. Since
 
-## Shared preferences
+### Shared preferences
 
 Install the library to manage app preferences and optionally save the counter as the app is terminated and opened anew.
 
@@ -373,7 +373,7 @@ void didUpdateWidget(oldWidget) {
 }
 ```
 
-## Save scroll value
+### Save scroll value
 
 Storing the value described by the wheels is more complex than toggling a boolean variable to condition the initial animation. This is because it should be possible to save the value both in the home and in the settings page, as the preference is ultimately toggled.
 
@@ -434,3 +434,9 @@ The goal is to then update the value in two instances:
 For the settings page you also need to handle when the page is removed with the back button. Flutter provides `WillPopScope`. In the `onWillPop` retrieve and return the preference as in the button included in the page.
 
 With the updated value the scrolling function needs to check the boolean instead of always referring to shared preferences.
+
+### Home again
+
+From the settings page the idea is to create a new counter by pushing the `Home` widget on the settings page and then remove all existing routes. The feat is achieved with `Navigator.pushNamedAndRemoveUntil`, specifically with a predicate function which always returns `false`.
+
+Since the counter is supposed to be new initialize the home screen with a scroll value of zero. Moreover, if the instance of shared preferences describes that the user wants to remember the counter, override the value with the new number.

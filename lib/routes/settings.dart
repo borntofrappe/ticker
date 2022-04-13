@@ -4,6 +4,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:ticker/widgets/custom_button.dart';
 import 'package:ticker/widgets/custom_checkbox_list_tile.dart';
 
+import 'package:ticker/helpers/screen_arguments.dart';
+
 class Settings extends StatelessWidget {
   final int scrollValue;
 
@@ -64,6 +66,32 @@ class Navigation extends StatelessWidget {
         },
         child: Icon(
           Icons.chevron_left,
+          color: Theme.of(context).primaryColor,
+        ),
+        size: 32.0,
+        borderWidth: 1.0,
+      ),
+      trailing: CustomButton(
+        onPressed: () async {
+          final preferences = await SharedPreferences.getInstance();
+
+          bool forgetMeNot = preferences.getBool('forget-me-not') ?? false;
+
+          if (forgetMeNot) {
+            preferences.setInt('scroll-value', 0);
+          }
+
+          Navigator.pushNamedAndRemoveUntil(
+            context,
+            '/home',
+            (Route<dynamic> route) => false,
+            arguments: ScreenArguments(
+              scrollValue: 0,
+            ),
+          );
+        },
+        child: Icon(
+          Icons.chevron_right,
           color: Theme.of(context).primaryColor,
         ),
         size: 32.0,
