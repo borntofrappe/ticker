@@ -4,18 +4,16 @@ class CustomButton extends StatelessWidget {
   final VoidCallback onPressed;
   final Widget child;
   final double size;
-  final Color color;
-  final Color overlayColor;
   final double borderWidth;
+  final bool showOverlay;
 
   const CustomButton({
     Key? key,
     required this.onPressed,
     required this.child,
     required this.size,
-    required this.color,
-    required this.overlayColor,
     required this.borderWidth,
+    this.showOverlay = true,
   }) : super(key: key);
 
   @override
@@ -24,25 +22,32 @@ class CustomButton extends StatelessWidget {
       width: size,
       height: size,
       child: OutlinedButton(
+        onPressed: onPressed,
+        child: AspectRatio(
+          aspectRatio: 1.0,
+          child: FittedBox(
+            child: child,
+          ),
+        ),
         style: ButtonStyle(
           padding: MaterialStateProperty.all(EdgeInsets.zero),
           shape: MaterialStateProperty.all(const BeveledRectangleBorder()),
           side: MaterialStateProperty.all(
             BorderSide(
-              color: color,
+              color: Theme.of(context).primaryColor,
               width: borderWidth,
             ),
           ),
-          overlayColor: MaterialStateProperty.resolveWith(
-            (states) {
-              return states.contains(MaterialState.pressed)
-                  ? overlayColor
-                  : null;
-            },
-          ),
+          overlayColor: showOverlay
+              ? MaterialStateProperty.resolveWith(
+                  (states) {
+                    return states.contains(MaterialState.pressed)
+                        ? Theme.of(context).highlightColor
+                        : null;
+                  },
+                )
+              : MaterialStateProperty.all(Colors.transparent),
         ),
-        child: child,
-        onPressed: onPressed,
       ),
     );
   }

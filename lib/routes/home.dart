@@ -150,14 +150,11 @@ class Navigation extends StatelessWidget {
           Provider.of<HomeChangeNotifier>(context, listen: false)._forgetMeNot =
               forgetMeNot;
         },
-        child: const Icon(
+        child: Icon(
           Icons.chevron_right,
-          size: 32.0,
-          color: Colors.black87,
+          color: Theme.of(context).primaryColor,
         ),
         size: 32.0,
-        color: Colors.black87,
-        overlayColor: Colors.black12,
         borderWidth: 1.0,
       ),
     );
@@ -390,44 +387,34 @@ class Buttons extends StatelessWidget {
               Provider.of<HomeChangeNotifier>(context, listen: false)
                   .scroll(-1);
             },
-            child: const FittedBox(
-              child: Text(
-                '-',
-                style: TextStyle(
-                  color: Colors.black87,
-                  fontSize: 64.0,
-                  fontWeight: FontWeight.bold,
-                  fontFeatures: [
-                    FontFeature.caseSensitiveForms(),
-                  ],
-                ),
+            child: Text(
+              '-',
+              style: TextStyle(
+                color: Theme.of(context).primaryColor,
+                fontWeight: FontWeight.bold,
+                fontFeatures: const [
+                  FontFeature.caseSensitiveForms(),
+                ],
               ),
             ),
             size: 64.0,
-            color: Colors.black87,
-            overlayColor: Colors.black12,
             borderWidth: 2.0,
           ),
           CustomButton(
             onPressed: () {
               Provider.of<HomeChangeNotifier>(context, listen: false).scroll(1);
             },
-            child: const FittedBox(
-              child: Text(
-                '+',
-                style: TextStyle(
-                  color: Colors.black87,
-                  fontSize: 64.0,
-                  fontWeight: FontWeight.bold,
-                  fontFeatures: [
-                    FontFeature.caseSensitiveForms(),
-                  ],
-                ),
+            child: Text(
+              '+',
+              style: TextStyle(
+                color: Theme.of(context).primaryColor,
+                fontWeight: FontWeight.bold,
+                fontFeatures: const [
+                  FontFeature.caseSensitiveForms(),
+                ],
               ),
             ),
             size: 64.0,
-            color: Colors.black87,
-            overlayColor: Colors.black12,
             borderWidth: 2.0,
           ),
         ],

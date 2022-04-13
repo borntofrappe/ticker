@@ -62,14 +62,11 @@ class Navigation extends StatelessWidget {
 
           Navigator.pop(context, forgetMeNot);
         },
-        child: const Icon(
+        child: Icon(
           Icons.chevron_left,
-          size: 32.0,
-          color: Colors.black87,
+          color: Theme.of(context).primaryColor,
         ),
         size: 32.0,
-        color: Colors.black87,
-        overlayColor: Colors.black12,
         borderWidth: 1.0,
       ),
     );
@@ -140,8 +137,6 @@ class _PreferencesState extends State<Preferences> {
           ),
         ),
         CustomCheckboxListTile(
-          title: const Text('Forget me not'),
-          subtitle: const Text('Save your number for the next time.'),
           onChanged: (bool? value) {
             setBoolPreference('forget-me-not', value);
             if (value ?? false) {
@@ -151,14 +146,16 @@ class _PreferencesState extends State<Preferences> {
             }
           },
           value: _forgetMeNot,
+          title: const Text('Forget me not'),
+          subtitle: const Text('Save your number for the next time.'),
         ),
         CustomCheckboxListTile(
-          title: const Text('Short on time'),
-          subtitle: const Text('Drastically reduce the initial animation.'),
           onChanged: (bool? value) {
             setBoolPreference('short-on-time', value);
           },
           value: _shortOnTime,
+          title: const Text('Short on time'),
+          subtitle: const Text('Drastically reduce the initial animation.'),
         ),
       ],
     );

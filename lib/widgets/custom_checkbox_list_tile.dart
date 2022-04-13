@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:ticker/widgets/custom_button.dart';
 
 class CustomCheckboxListTile extends StatefulWidget {
   final Function onChanged;
@@ -7,6 +8,7 @@ class CustomCheckboxListTile extends StatefulWidget {
   final Widget? subtitle;
   final double checkboxSize;
   final double iconSize;
+  final double borderWidth;
   final IconData icon;
 
   const CustomCheckboxListTile({
@@ -17,6 +19,7 @@ class CustomCheckboxListTile extends StatefulWidget {
     this.subtitle,
     this.checkboxSize = 24.0,
     this.iconSize = 18.0,
+    this.borderWidth = 1.0,
     this.icon = Icons.close,
   }) : super(key: key);
 
@@ -36,68 +39,47 @@ class _CustomCheckboxListTileState extends State<CustomCheckboxListTile> {
     });
   }
 
-  @override
-  void didUpdateWidget(oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    setState(() {
-      _value = widget.value;
-    });
+  void _updateValue() {
+    setState(
+      () {
+        _value = !_value;
+      },
+    );
+    widget.onChanged(_value);
   }
 
   @override
   Widget build(BuildContext context) {
-    Function onChanged = widget.onChanged;
     Widget title = widget.title;
     Widget? subtitle = widget.subtitle;
     double checkboxSize = widget.checkboxSize;
     double iconSize = widget.iconSize;
+    double borderWidth = widget.borderWidth;
     IconData icon = widget.icon;
 
     return ListTile(
       title: title,
       subtitle: subtitle,
-      trailing: SizedBox(
-        width: checkboxSize,
-        height: checkboxSize,
-        child: OutlinedButton(
-          style: ButtonStyle(
-            padding: MaterialStateProperty.all(EdgeInsets.zero),
-            shape: MaterialStateProperty.all(const BeveledRectangleBorder()),
-            side: MaterialStateProperty.all(
-              BorderSide(
-                color: Theme.of(context).primaryColor,
-                width: 1.0,
-              ),
-            ),
-            overlayColor: MaterialStateProperty.all(Colors.transparent),
-          ),
-          child: _value
-              ? Center(
-                  child: Icon(
-                    icon,
-                    size: iconSize,
-                    color: Theme.of(context).primaryColor,
-                  ),
-                )
-              : Container(),
-          onPressed: () {
-            setState(
-              () {
-                _value = !_value;
-                onChanged(_value);
-              },
-            );
-          },
-        ),
-      ),
       onTap: () {
-        setState(
-          () {
-            _value = !_value;
-            onChanged(_value);
-          },
-        );
+        _updateValue();
       },
+      trailing: CustomButton(
+        onPressed: () {
+          _updateValue();
+        },
+        child: _value
+            ? Padding(
+                padding: EdgeInsets.all((checkboxSize - iconSize) / 2),
+                child: Icon(
+                  icon,
+                  color: Theme.of(context).primaryColor,
+                ),
+              )
+            : Container(),
+        size: checkboxSize,
+        borderWidth: borderWidth,
+        showOverlay: false,
+      ),
     );
   }
 }
