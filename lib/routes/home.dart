@@ -26,9 +26,8 @@ class HomeChangeNotifier extends ChangeNotifier {
   }
 
   void scroll(int direction) {
-    const int scrollDuration = 400;
-    int duration = scrollDuration ~/ _controllers.length;
-    int delay = 0;
+    int scrollDurationPerItem = 150;
+    int scrollDelay = 0;
 
     direction *= -1;
 
@@ -47,24 +46,24 @@ class HomeChangeNotifier extends ChangeNotifier {
       }
 
       Future.delayed(
-        Duration(milliseconds: delay),
+        Duration(milliseconds: scrollDelay),
         () {
           controller.animateToItem(
             controller.selectedItem + 1 * direction,
-            duration: Duration(milliseconds: duration),
+            duration: Duration(milliseconds: scrollDurationPerItem),
             curve: Curves.easeInOutQuad,
           );
         },
       );
 
-      delay += duration ~/ 3;
+      scrollDelay += scrollDurationPerItem ~/ 3;
     } while (index > 0 &&
         ((direction == 1 && _controllers[index].selectedItem % _digits == 0) ||
             (direction == -1 && _controllers[index].selectedItem == 1)));
 
     if (_forgetMeNot) {
       Future.delayed(
-        const Duration(milliseconds: scrollDuration),
+        Duration(milliseconds: scrollDelay),
         () {
           saveScrollValue();
         },
@@ -93,15 +92,24 @@ class HomeChangeNotifier extends ChangeNotifier {
     }
     return value;
   }
+
+  int getCount() {
+    return _controllers.length;
+  }
+
+  void setSavingPreference(forgetMeNot) {
+    _forgetMeNot = forgetMeNot;
+  }
 }
 
 class Home extends StatelessWidget {
-  final int scrollValue;
   final int count;
+  final int scrollValue;
+
   const Home({
     Key? key,
-    required this.scrollValue,
     required this.count,
+    required this.scrollValue,
   }) : super(key: key);
 
   @override
@@ -116,8 +124,8 @@ class Home extends StatelessWidget {
               Expanded(
                 flex: 3,
                 child: Wheels(
-                  scrollValue: scrollValue,
                   count: count,
+                  scrollValue: scrollValue,
                 ),
               ),
               const Expanded(
@@ -140,22 +148,20 @@ class Navigation extends StatelessWidget {
     return ListTile(
       trailing: CustomButton(
         onPressed: () async {
-          final preferences = await SharedPreferences.getInstance();
-          int count = preferences.getInt('count') ?? 3;
-
           final bool forgetMeNot = await Navigator.pushNamed(
             context,
             '/settings',
             arguments: ScreenArguments(
+              count: Provider.of<HomeChangeNotifier>(context, listen: false)
+                  .getCount(),
               scrollValue:
                   Provider.of<HomeChangeNotifier>(context, listen: false)
                       .getScrollValue(),
-              count: count,
             ),
           ) as bool;
 
-          Provider.of<HomeChangeNotifier>(context, listen: false)._forgetMeNot =
-              forgetMeNot;
+          Provider.of<HomeChangeNotifier>(context, listen: false)
+              .setSavingPreference(forgetMeNot);
         },
         child: Icon(
           Icons.chevron_right,
@@ -195,6 +201,7 @@ class _WheelsState extends State<Wheels> {
     );
 
     int scrollValue = widget.scrollValue;
+
     if (scrollValue > 0) {
       const int scrollDelay = 750;
 
@@ -218,8 +225,9 @@ class _WheelsState extends State<Wheels> {
 
   void _scrollTo(scrollValue) {
     int value = scrollValue;
-    int duration = 2000 ~/ _controllers.length;
-    int delay = 0;
+    const int scrollDuration = 2000;
+    int scrollDurationPerWheel = scrollDuration ~/ _controllers.length;
+    int scrollDelay = 0;
 
     int index = _controllers.length - 1;
 
@@ -231,17 +239,17 @@ class _WheelsState extends State<Wheels> {
       controller.jumpToItem(_digits);
 
       Future.delayed(
-        Duration(milliseconds: delay),
+        Duration(milliseconds: scrollDelay),
         () {
           controller.animateToItem(
             _digits - digit,
-            duration: Duration(milliseconds: duration),
+            duration: Duration(milliseconds: scrollDurationPerWheel),
             curve: Curves.easeInOutCubic,
           );
         },
       );
 
-      delay += duration - (duration ~/ 2);
+      scrollDelay += scrollDurationPerWheel ~/ 2;
 
       value = value ~/ _digits;
       index--;
@@ -278,9 +286,9 @@ class _WheelsState extends State<Wheels> {
                       child: Container(
                         margin: const EdgeInsets.symmetric(horizontal: margin),
                         child: Wheel(
+                          controller: controller,
                           itemExtent: itemExtent,
                           borderWidth: borderWidth,
-                          controller: controller,
                         ),
                       ),
                     ),
@@ -295,15 +303,15 @@ class _WheelsState extends State<Wheels> {
 }
 
 class Wheel extends StatelessWidget {
+  final FixedExtentScrollController controller;
   final double itemExtent;
   final double borderWidth;
-  final FixedExtentScrollController controller;
 
   const Wheel({
     Key? key,
+    required this.controller,
     required this.itemExtent,
     required this.borderWidth,
-    required this.controller,
   }) : super(key: key);
 
   @override
@@ -317,7 +325,8 @@ class Wheel extends StatelessWidget {
             controller: controller,
             itemExtent: itemExtent,
             children: List<Widget>.generate(
-              _digits + 1,
+              _digits +
+                  1, // there's one more item than there are digits to fabricate the closed wheel
               (index) => Item(
                 digit: index % _digits,
               ),
@@ -382,6 +391,18 @@ class Buttons extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    double size = 64.0;
+    double borderWidth = 2.0;
+
+    TextStyle textStyle = TextStyle(
+      color: Theme.of(context).primaryColor,
+      fontWeight: FontWeight.bold,
+      fontSize: size, // fixes horizontal alignment
+      fontFeatures: const [
+        FontFeature.caseSensitiveForms(),
+      ],
+    );
+
     return ConstrainedBox(
       constraints: const BoxConstraints(
         maxWidth: 480.0,
@@ -396,16 +417,10 @@ class Buttons extends StatelessWidget {
             },
             child: Text(
               '-',
-              style: TextStyle(
-                color: Theme.of(context).primaryColor,
-                fontWeight: FontWeight.bold,
-                fontFeatures: const [
-                  FontFeature.caseSensitiveForms(),
-                ],
-              ),
+              style: textStyle,
             ),
-            size: 64.0,
-            borderWidth: 2.0,
+            size: size,
+            borderWidth: borderWidth,
           ),
           CustomButton(
             onPressed: () {
@@ -413,16 +428,10 @@ class Buttons extends StatelessWidget {
             },
             child: Text(
               '+',
-              style: TextStyle(
-                color: Theme.of(context).primaryColor,
-                fontWeight: FontWeight.bold,
-                fontFeatures: const [
-                  FontFeature.caseSensitiveForms(),
-                ],
-              ),
+              style: textStyle,
             ),
-            size: 64.0,
-            borderWidth: 2.0,
+            size: size,
+            borderWidth: borderWidth,
           ),
         ],
       ),
