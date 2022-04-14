@@ -16,7 +16,7 @@ class SplashScreen extends StatefulWidget {
 
 class _SplashScreenState extends State<SplashScreen> {
   static const double _itemExtent = 200.0;
-  static const int _scrollDurationPerLetter = 320;
+  static const int _scrollDurationPerItem = 320;
   static const int _scrollDelay = 1000;
 
   late FixedExtentScrollController _controller;
@@ -24,15 +24,16 @@ class _SplashScreenState extends State<SplashScreen> {
   void _goToHomeRoute() async {
     final preferences = await SharedPreferences.getInstance();
     bool forgetMeNot = preferences.getBool('forget-me-not') ?? false;
-    int scrollValue = forgetMeNot ? preferences.getInt('scroll-value') ?? 0 : 0;
+
     int count = preferences.getInt('count') ?? 3;
+    int scrollValue = forgetMeNot ? preferences.getInt('scroll-value') ?? 0 : 0;
 
     Navigator.pushReplacementNamed(
       context,
       '/home',
       arguments: ScreenArguments(
-        scrollValue: scrollValue,
         count: count,
+        scrollValue: scrollValue,
       ),
     );
   }
@@ -42,33 +43,28 @@ class _SplashScreenState extends State<SplashScreen> {
 
     final bool shortOnTime = preferences.getBool('short-on-time') ?? false;
 
-    if (shortOnTime) {
-      Future.delayed(
-        const Duration(milliseconds: _scrollDelay),
-        () {
+    Future.delayed(
+      const Duration(milliseconds: _scrollDelay),
+      () {
+        if (shortOnTime) {
           _goToHomeRoute();
-        },
-      );
-    } else {
-      final int length = widget.text.length;
+        } else {
+          final int length = widget.text.length;
 
-      Future.delayed(
-        const Duration(milliseconds: _scrollDelay),
-        () {
           _controller
               .animateToItem(
-            length - 1,
-            duration: Duration(milliseconds: _scrollDurationPerLetter * length),
-            curve: Curves.easeInOutSine,
+            length, // there's one more item than there are words, so you are not off by one
+            duration: Duration(milliseconds: _scrollDurationPerItem * length),
+            curve: Curves.easeInOutQuad,
           )
               .then(
             (_) {
               _goToHomeRoute();
             },
           );
-        },
-      );
-    }
+        }
+      },
+    );
   }
 
   @override
@@ -107,19 +103,24 @@ class _SplashScreenState extends State<SplashScreen> {
                 controller: _controller,
                 itemExtent: _itemExtent,
                 childDelegate: ListWheelChildBuilderDelegate(
-                  childCount: widget.text.length,
+                  childCount: widget.text.length + 1,
                   builder: (BuildContext context, int index) {
                     return RotatedBox(
                       quarterTurns: 1,
                       child: AspectRatio(
                         aspectRatio: 1.0,
                         child: FittedBox(
-                          child: Text(
-                            widget.text[index],
-                            style: const TextStyle(
-                              fontWeight: FontWeight.w700,
-                            ),
-                          ),
+                          child: index == 0
+                              ? Icon(
+                                  Icons.chevron_right,
+                                  color: Theme.of(context).primaryColor,
+                                )
+                              : Text(
+                                  widget.text[index - 1],
+                                  style: const TextStyle(
+                                    fontWeight: FontWeight.w700,
+                                  ),
+                                ),
                         ),
                       ),
                     );

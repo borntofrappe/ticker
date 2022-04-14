@@ -27,21 +27,19 @@ class App extends StatelessWidget {
       ),
       onGenerateRoute: (RouteSettings settings) {
         if (settings.name == '/home') {
-          const int slideDuration = 1000;
           final args = settings.arguments as ScreenArguments;
           return slideToRoute(
             Home(
-              scrollValue: args.scrollValue,
               count: args.count,
+              scrollValue: args.scrollValue,
             ),
-            slideDuration,
           );
         } else if (settings.name == '/settings') {
           final args = settings.arguments as ScreenArguments;
           return slideToRoute(
             Settings(
-              scrollValue: args.scrollValue,
               count: args.count,
+              scrollValue: args.scrollValue,
             ),
           );
         }

@@ -1,9 +1,9 @@
 class ScreenArguments {
-  int scrollValue;
   int count;
+  int scrollValue;
 
   ScreenArguments({
-    required this.scrollValue,
     required this.count,
+    required this.scrollValue,
   });
 }
