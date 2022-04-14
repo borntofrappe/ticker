@@ -28,6 +28,7 @@ class HomeChangeNotifier extends ChangeNotifier {
   void scroll(int direction) {
     int scrollDurationPerItem = 150;
     int scrollDelay = 0;
+    int saveScrollValueDelay = 0;
 
     direction *= -1;
 
@@ -57,13 +58,14 @@ class HomeChangeNotifier extends ChangeNotifier {
       );
 
       scrollDelay += scrollDurationPerItem ~/ 3;
+      saveScrollValueDelay += scrollDurationPerItem;
     } while (index > 0 &&
         ((direction == 1 && _controllers[index].selectedItem % _digits == 0) ||
             (direction == -1 && _controllers[index].selectedItem == 1)));
 
     if (_forgetMeNot) {
       Future.delayed(
-        Duration(milliseconds: scrollDelay),
+        Duration(milliseconds: saveScrollValueDelay),
         () {
           saveScrollValue();
         },
