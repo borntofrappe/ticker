@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:ticker/widgets/custom_button.dart';
@@ -7,14 +8,26 @@ import 'package:ticker/widgets/custom_range_list_tile.dart';
 
 import 'package:ticker/helpers/screen_arguments.dart';
 
+class SettingsChangeNotifier extends ChangeNotifier {
+  int? _count;
+
+  void setCount(int count) {
+    _count = count;
+  }
+
+  int? getCount() {
+    return _count;
+  }
+}
+
 class Settings extends StatelessWidget {
-  final int scrollValue;
   final int count;
+  final int scrollValue;
 
   const Settings({
     Key? key,
-    this.scrollValue = 0,
     this.count = 3,
+    this.scrollValue = 0,
   }) : super(key: key);
 
   @override
@@ -29,25 +42,28 @@ class Settings extends StatelessWidget {
           return false;
         },
         child: SafeArea(
-          child: Column(
-            children: <Widget>[
-              const Navigation(),
-              const ListTile(
-                title: Text(
-                  'Ticker',
-                  style: TextStyle(
-                    fontSize: 24.0,
-                    color: Colors.black87,
+          child: ChangeNotifierProvider(
+            create: (_) => SettingsChangeNotifier(),
+            child: Column(
+              children: <Widget>[
+                const Navigation(),
+                const ListTile(
+                  title: Text(
+                    'Ticker',
+                    style: TextStyle(
+                      fontSize: 24.0,
+                      color: Colors.black87,
+                    ),
                   ),
                 ),
-              ),
-              Expanded(
-                child: Preferences(
-                  scrollValue: scrollValue,
-                  count: count,
+                Expanded(
+                  child: Preferences(
+                    count: count,
+                    scrollValue: scrollValue,
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),
@@ -80,10 +96,17 @@ class Navigation extends StatelessWidget {
           final preferences = await SharedPreferences.getInstance();
 
           bool forgetMeNot = preferences.getBool('forget-me-not') ?? false;
-          int count = preferences.getInt('count') ?? 3;
 
           if (forgetMeNot) {
             preferences.setInt('scroll-value', 0);
+          }
+
+          int? count =
+              Provider.of<SettingsChangeNotifier>(context, listen: false)
+                  .getCount();
+
+          if (count != null) {
+            preferences.setInt('count', count);
           }
 
           Navigator.pushNamedAndRemoveUntil(
@@ -92,7 +115,7 @@ class Navigation extends StatelessWidget {
             (Route<dynamic> route) => false,
             arguments: ScreenArguments(
               scrollValue: 0,
-              count: count,
+              count: count ?? 3,
             ),
           );
         },
@@ -166,21 +189,14 @@ class _PreferencesState extends State<Preferences> {
     return ListView(
       children: <Widget>[
         ListTile(
+          dense: true,
           title: Text(
-            'Preferences'.toUpperCase(),
+            'App Preferences'.toUpperCase(),
             style: const TextStyle(
               fontSize: 14.0,
               color: Colors.black54,
             ),
           ),
-        ),
-        CustomRangeListTile(
-          min: 1,
-          max: 5,
-          value: _count,
-          onChanged: (int value) {
-            setIntPreference('count', value);
-          },
         ),
         CustomCheckboxListTile(
           onChanged: (bool? value) {
@@ -193,7 +209,7 @@ class _PreferencesState extends State<Preferences> {
           },
           value: _forgetMeNot,
           title: const Text('Forget me not'),
-          subtitle: const Text('Save your counter for the next time.'),
+          subtitle: const Text('Some numbers are worth remembering.'),
         ),
         CustomCheckboxListTile(
           onChanged: (bool? value) {
@@ -201,7 +217,34 @@ class _PreferencesState extends State<Preferences> {
           },
           value: _shortOnTime,
           title: const Text('Short on time'),
-          subtitle: const Text('Drastically reduce the initial animation.'),
+          subtitle: const Text('Even few seconds deserve saving.'),
+        ),
+        const SizedBox(height: 16.0),
+        ListTile(
+          dense: true,
+          title: Text(
+            'Counter Preferences'.toUpperCase(),
+            style: const TextStyle(
+              fontSize: 14.0,
+              color: Colors.black54,
+            ),
+          ),
+        ),
+        CustomRangeListTile(
+          onChanged: (int value) {
+            // do not update count in shared preferences until you create a new counter
+            Provider.of<SettingsChangeNotifier>(context, listen: false)
+                .setCount(value);
+
+            setState(() {
+              _count = value;
+            });
+          },
+          min: 1,
+          max: 5,
+          value: _count,
+          title: const Text('Fresh start'),
+          subtitle: Text('Count from zero' + ' zero' * (_count - 1) + '.'),
         ),
       ],
     );
