@@ -9,7 +9,6 @@ class CustomRangeListTile extends StatelessWidget {
   final Widget title;
   final Widget? subtitle;
   final double buttonSize;
-  final double borderWidth;
 
   const CustomRangeListTile({
     Key? key,
@@ -19,8 +18,7 @@ class CustomRangeListTile extends StatelessWidget {
     this.value = 1,
     required this.title,
     this.subtitle,
-    this.buttonSize = 24.0,
-    this.borderWidth = 1.0,
+    this.buttonSize = 28.0,
   }) : super(key: key);
 
   void _updateValue() {
@@ -44,12 +42,11 @@ class CustomRangeListTile extends StatelessWidget {
           child: Text(
             '$value',
             style: TextStyle(
-              color: Theme.of(context).primaryColor,
+              color: Theme.of(context).colorScheme.primary,
             ),
           ),
         ),
         size: buttonSize,
-        borderWidth: borderWidth,
         showOverlay: false,
       ),
     );

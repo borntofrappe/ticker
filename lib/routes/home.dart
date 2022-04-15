@@ -147,6 +147,8 @@ class Navigation extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    const double size = 42.0;
+
     return ListTile(
       trailing: CustomButton(
         onPressed: () async {
@@ -166,11 +168,11 @@ class Navigation extends StatelessWidget {
               .setSavingPreference(forgetMeNot);
         },
         child: Icon(
-          Icons.chevron_right,
-          color: Theme.of(context).primaryColor,
+          Icons.chevron_right_rounded,
+          color: Theme.of(context).colorScheme.primary,
+          semanticLabel: 'Go to app preferences',
         ),
-        size: 32.0,
-        borderWidth: 1.0,
+        size: size,
       ),
     );
   }
@@ -260,8 +262,7 @@ class _WheelsState extends State<Wheels> {
 
   @override
   Widget build(BuildContext context) {
-    const double margin = 6.0;
-    const double borderWidth = 4.0;
+    const double margin = 10.0;
 
     Provider.of<HomeChangeNotifier>(context, listen: false).init(_controllers);
 
@@ -290,7 +291,6 @@ class _WheelsState extends State<Wheels> {
                         child: Wheel(
                           controller: controller,
                           itemExtent: itemExtent,
-                          borderWidth: borderWidth,
                         ),
                       ),
                     ),
@@ -307,20 +307,40 @@ class _WheelsState extends State<Wheels> {
 class Wheel extends StatelessWidget {
   final FixedExtentScrollController controller;
   final double itemExtent;
-  final double borderWidth;
 
   const Wheel({
     Key? key,
     required this.controller,
     required this.itemExtent,
-    required this.borderWidth,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
+    double borderWidth = itemExtent / 20;
+    double borderRadius = itemExtent / 6;
+
     return Center(
       child: Stack(
         children: [
+          ExcludeSemantics(
+            child: ListWheelScrollView(
+              physics: const NeverScrollableScrollPhysics(),
+              itemExtent: itemExtent,
+              children: <Widget>[
+                AspectRatio(
+                  aspectRatio: 1.0,
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: Theme.of(context).colorScheme.background,
+                      borderRadius: BorderRadius.all(
+                        Radius.circular(borderRadius),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
           ListWheelScrollView(
             overAndUnderCenterOpacity: 0,
             physics: const NeverScrollableScrollPhysics(),
@@ -336,10 +356,22 @@ class Wheel extends StatelessWidget {
           ),
           ExcludeSemantics(
             child: ListWheelScrollView(
+              physics: const NeverScrollableScrollPhysics(),
               itemExtent: itemExtent,
               children: <Widget>[
-                Item(
-                  borderWidth: borderWidth,
+                AspectRatio(
+                  aspectRatio: 1.0,
+                  child: Container(
+                    decoration: BoxDecoration(
+                      border: Border.all(
+                        color: Theme.of(context).colorScheme.primary,
+                        width: borderWidth,
+                      ),
+                      borderRadius: BorderRadius.all(
+                        Radius.circular(borderRadius),
+                      ),
+                    ),
+                  ),
                 ),
               ],
             ),
@@ -351,37 +383,24 @@ class Wheel extends StatelessWidget {
 }
 
 class Item extends StatelessWidget {
-  final int? digit;
-  final double? borderWidth;
+  final int digit;
 
   const Item({
     Key? key,
-    this.digit,
-    this.borderWidth,
+    required this.digit,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return AspectRatio(
       aspectRatio: 1,
-      child: Container(
-        decoration: borderWidth != null
-            ? BoxDecoration(
-                border: Border.all(
-                  width: borderWidth ?? 0,
-                  color: Theme.of(context).primaryColor,
-                ),
-              )
-            : null,
-        child: FittedBox(
-          child: digit != null
-              ? Text(
-                  '$digit',
-                  style: const TextStyle(
-                    fontWeight: FontWeight.w700,
-                  ),
-                )
-              : null,
+      child: FittedBox(
+        child: Text(
+          '$digit',
+          style: TextStyle(
+            color: Theme.of(context).colorScheme.primary,
+            fontWeight: FontWeight.w700,
+          ),
         ),
       ),
     );
@@ -393,11 +412,10 @@ class Buttons extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    double size = 64.0;
-    double borderWidth = 2.0;
+    double size = 72.0;
 
     TextStyle textStyle = TextStyle(
-      color: Theme.of(context).primaryColor,
+      color: Theme.of(context).colorScheme.primary,
       fontWeight: FontWeight.bold,
       fontSize: size, // fixes horizontal alignment
       fontFeatures: const [
@@ -422,7 +440,6 @@ class Buttons extends StatelessWidget {
               style: textStyle,
             ),
             size: size,
-            borderWidth: borderWidth,
           ),
           CustomButton(
             onPressed: () {
@@ -433,7 +450,6 @@ class Buttons extends StatelessWidget {
               style: textStyle,
             ),
             size: size,
-            borderWidth: borderWidth,
           ),
         ],
       ),

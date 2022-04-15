@@ -4,7 +4,6 @@ class CustomButton extends StatelessWidget {
   final VoidCallback onPressed;
   final Widget child;
   final double size;
-  final double borderWidth;
   final bool showOverlay;
 
   const CustomButton({
@@ -12,12 +11,14 @@ class CustomButton extends StatelessWidget {
     required this.onPressed,
     required this.child,
     required this.size,
-    required this.borderWidth,
     this.showOverlay = true,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
+    double borderWidth = size / 20;
+    double borderRadius = size / 6;
+
     return SizedBox(
       width: size,
       height: size,
@@ -30,11 +31,19 @@ class CustomButton extends StatelessWidget {
           ),
         ),
         style: ButtonStyle(
+          backgroundColor: MaterialStateProperty.all(
+              Theme.of(context).colorScheme.background),
           padding: MaterialStateProperty.all(EdgeInsets.zero),
-          shape: MaterialStateProperty.all(const BeveledRectangleBorder()),
+          shape: MaterialStateProperty.all(
+            RoundedRectangleBorder(
+              borderRadius: BorderRadius.all(
+                Radius.circular(borderRadius),
+              ),
+            ),
+          ),
           side: MaterialStateProperty.all(
             BorderSide(
-              color: Theme.of(context).primaryColor,
+              color: Theme.of(context).colorScheme.primary,
               width: borderWidth,
             ),
           ),
@@ -42,7 +51,7 @@ class CustomButton extends StatelessWidget {
               ? MaterialStateProperty.resolveWith(
                   (states) {
                     return states.contains(MaterialState.pressed)
-                        ? Theme.of(context).highlightColor
+                        ? Theme.of(context).colorScheme.shadow
                         : null;
                   },
                 )

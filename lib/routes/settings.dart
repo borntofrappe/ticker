@@ -49,13 +49,10 @@ class Settings extends StatelessWidget {
                 Navigation(
                   previousCount: count,
                 ),
-                const ListTile(
+                ListTile(
                   title: Text(
                     'Ticker',
-                    style: TextStyle(
-                      fontSize: 24.0,
-                      color: Colors.black87,
-                    ),
+                    style: Theme.of(context).textTheme.headline1,
                   ),
                 ),
                 Expanded(
@@ -83,6 +80,8 @@ class Navigation extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    const double size = 42.0;
+
     return ListTile(
       leading: CustomButton(
         onPressed: () async {
@@ -92,11 +91,11 @@ class Navigation extends StatelessWidget {
           Navigator.pop(context, forgetMeNot);
         },
         child: Icon(
-          Icons.chevron_left,
-          color: Theme.of(context).primaryColor,
+          Icons.chevron_left_rounded,
+          color: Theme.of(context).colorScheme.primary,
+          semanticLabel: 'Go to previous counter',
         ),
-        size: 32.0,
-        borderWidth: 1.0,
+        size: size,
       ),
       trailing: CustomButton(
         onPressed: () async {
@@ -127,11 +126,11 @@ class Navigation extends StatelessWidget {
           );
         },
         child: Icon(
-          Icons.chevron_right,
-          color: Theme.of(context).primaryColor,
+          Icons.chevron_right_rounded,
+          color: Theme.of(context).colorScheme.primary,
+          semanticLabel: 'Go to new counter',
         ),
-        size: 32.0,
-        borderWidth: 1.0,
+        size: size,
       ),
     );
   }
@@ -193,16 +192,16 @@ class _PreferencesState extends State<Preferences> {
 
   @override
   Widget build(BuildContext context) {
+    double widgetSize = 28.0;
+    double iconSize = 20.0;
+
     return ListView(
       children: <Widget>[
         ListTile(
           dense: true,
           title: Text(
             'App Preferences'.toUpperCase(),
-            style: const TextStyle(
-              fontSize: 14.0,
-              color: Colors.black54,
-            ),
+            style: Theme.of(context).textTheme.headline2,
           ),
         ),
         CustomCheckboxListTile(
@@ -219,8 +218,16 @@ class _PreferencesState extends State<Preferences> {
             }
           },
           value: _forgetMeNot,
-          title: const Text('Forget me not'),
-          subtitle: const Text('Some numbers are worth remembering.'),
+          title: Text(
+            'Forget me not',
+            style: Theme.of(context).textTheme.headline3,
+          ),
+          subtitle: Text(
+            'Some numbers are worth remembering.',
+            style: Theme.of(context).textTheme.headline4,
+          ),
+          checkboxSize: widgetSize,
+          iconSize: iconSize,
         ),
         CustomCheckboxListTile(
           onChanged: (bool value) {
@@ -230,18 +237,23 @@ class _PreferencesState extends State<Preferences> {
             setBoolPreference('short-on-time', _shortOnTime);
           },
           value: _shortOnTime,
-          title: const Text('Short on time'),
-          subtitle: const Text('Even few seconds deserve saving.'),
+          title: Text(
+            'Short on time',
+            style: Theme.of(context).textTheme.headline3,
+          ),
+          subtitle: Text(
+            'Even few seconds deserve saving.',
+            style: Theme.of(context).textTheme.headline4,
+          ),
+          checkboxSize: widgetSize,
+          iconSize: iconSize,
         ),
         const SizedBox(height: 16.0),
         ListTile(
           dense: true,
           title: Text(
             'Counter Preferences'.toUpperCase(),
-            style: const TextStyle(
-              fontSize: 14.0,
-              color: Colors.black54,
-            ),
+            style: Theme.of(context).textTheme.headline2,
           ),
         ),
         CustomRangeListTile(
@@ -256,8 +268,15 @@ class _PreferencesState extends State<Preferences> {
           min: 1,
           max: 5,
           value: _count,
-          title: const Text('Fresh start'),
-          subtitle: Text('Count from zero' + ' zero' * (_count - 1) + '.'),
+          title: Text(
+            'Fresh start',
+            style: Theme.of(context).textTheme.headline3,
+          ),
+          subtitle: Text(
+            'Count from zero' + ' zero' * (_count - 1) + '.',
+            style: Theme.of(context).textTheme.headline4,
+          ),
+          buttonSize: widgetSize,
         ),
       ],
     );

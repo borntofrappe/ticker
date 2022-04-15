@@ -9,7 +9,6 @@ class CustomCheckboxListTile extends StatelessWidget {
   final double checkboxSize;
   final IconData icon;
   final double iconSize;
-  final double borderWidth;
 
   const CustomCheckboxListTile({
     Key? key,
@@ -17,10 +16,9 @@ class CustomCheckboxListTile extends StatelessWidget {
     this.value = false,
     required this.title,
     this.subtitle,
-    this.checkboxSize = 24.0,
-    this.icon = Icons.close,
-    this.iconSize = 18.0,
-    this.borderWidth = 1.0,
+    this.checkboxSize = 28.0,
+    this.icon = Icons.close_rounded,
+    this.iconSize = 20.0,
   }) : super(key: key);
 
   void _updateValue() {
@@ -44,12 +42,11 @@ class CustomCheckboxListTile extends StatelessWidget {
                 padding: EdgeInsets.all((checkboxSize - iconSize) / 2),
                 child: Icon(
                   icon,
-                  color: Theme.of(context).primaryColor,
+                  color: Theme.of(context).colorScheme.primary,
                 ),
               )
             : Container(),
         size: checkboxSize,
-        borderWidth: borderWidth,
         showOverlay: false,
       ),
     );

@@ -15,8 +15,7 @@ class SplashScreen extends StatefulWidget {
 }
 
 class _SplashScreenState extends State<SplashScreen> {
-  static const double _itemExtent = 200.0;
-  static const int _scrollDurationPerItem = 320;
+  static const int _scrollDurationPerItem = 350;
   static const int _scrollDelay = 1000;
 
   late FixedExtentScrollController _controller;
@@ -89,19 +88,40 @@ class _SplashScreenState extends State<SplashScreen> {
 
   @override
   Widget build(BuildContext context) {
-    const double borderWidth = 8.0;
+    const double itemExtent = 200.0;
+    const double borderWidth = itemExtent / 20;
+    const double borderRadius = itemExtent / 6;
 
     return Scaffold(
       body: Center(
         child: Stack(
           children: [
+            ExcludeSemantics(
+              child: ListWheelScrollView(
+                physics: const NeverScrollableScrollPhysics(),
+                itemExtent: itemExtent,
+                children: <Widget>[
+                  AspectRatio(
+                    aspectRatio: 1.0,
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: Theme.of(context).colorScheme.background,
+                        borderRadius: const BorderRadius.all(
+                          Radius.circular(borderRadius),
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
             RotatedBox(
               quarterTurns: -1,
               child: ListWheelScrollView.useDelegate(
                 overAndUnderCenterOpacity: 0.0,
                 physics: const NeverScrollableScrollPhysics(),
                 controller: _controller,
-                itemExtent: _itemExtent,
+                itemExtent: itemExtent,
                 childDelegate: ListWheelChildBuilderDelegate(
                   childCount: widget.text.length + 1,
                   builder: (BuildContext context, int index) {
@@ -112,12 +132,14 @@ class _SplashScreenState extends State<SplashScreen> {
                         child: FittedBox(
                           child: index == 0
                               ? Icon(
-                                  Icons.chevron_right,
-                                  color: Theme.of(context).primaryColor,
+                                  Icons.chevron_right_rounded,
+                                  color: Theme.of(context).colorScheme.primary,
                                 )
                               : Text(
                                   widget.text[index - 1],
-                                  style: const TextStyle(
+                                  style: TextStyle(
+                                    color:
+                                        Theme.of(context).colorScheme.primary,
                                     fontWeight: FontWeight.w700,
                                   ),
                                 ),
@@ -131,15 +153,18 @@ class _SplashScreenState extends State<SplashScreen> {
             ExcludeSemantics(
               child: ListWheelScrollView(
                 physics: const NeverScrollableScrollPhysics(),
-                itemExtent: _itemExtent,
+                itemExtent: itemExtent,
                 children: <Widget>[
                   AspectRatio(
                     aspectRatio: 1.0,
                     child: Container(
                       decoration: BoxDecoration(
                         border: Border.all(
+                          color: Theme.of(context).colorScheme.primary,
                           width: borderWidth,
-                          color: Theme.of(context).primaryColor,
+                        ),
+                        borderRadius: const BorderRadius.all(
+                          Radius.circular(borderRadius),
                         ),
                       ),
                     ),

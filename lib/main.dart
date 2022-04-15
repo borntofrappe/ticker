@@ -18,8 +18,22 @@ class App extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       theme: ThemeData(
-        primaryColor: Colors.black87,
-        highlightColor: Colors.black12,
+        scaffoldBackgroundColor: Colors.white,
+        colorScheme: const ColorScheme.light().copyWith(
+          primary: Colors.black87,
+          background: Colors.white,
+          shadow: Colors.black12,
+        ),
+        textTheme: const TextTheme(
+          headline1: TextStyle(fontSize: 24.0, color: Colors.black87),
+          headline2: TextStyle(fontSize: 14.0, color: Colors.black54),
+          headline3: TextStyle(
+            fontSize: 14.0,
+            color: Colors.black87,
+            fontWeight: FontWeight.w700,
+          ),
+          headline4: TextStyle(fontSize: 14.0, color: Colors.black54),
+        ),
         fontFamily: 'Inter',
       ),
       home: const SplashScreen(
