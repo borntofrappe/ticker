@@ -115,7 +115,7 @@ class Navigation extends StatelessWidget {
             (Route<dynamic> route) => false,
             arguments: ScreenArguments(
               scrollValue: 0,
-              count: count ?? 3,
+              count: count ?? 3, // should be widget's count
             ),
           );
         },
@@ -154,6 +154,7 @@ class _PreferencesState extends State<Preferences> {
     super.initState();
 
     getBoolPreferences();
+    _count = widget.count;
   }
 
   void getBoolPreferences() async {
@@ -162,7 +163,6 @@ class _PreferencesState extends State<Preferences> {
       () {
         _shortOnTime = preferences.getBool('short-on-time') ?? false;
         _forgetMeNot = preferences.getBool('forget-me-not') ?? false;
-        _count = preferences.getInt('count') ?? 3;
       },
     );
   }
@@ -199,9 +199,13 @@ class _PreferencesState extends State<Preferences> {
           ),
         ),
         CustomCheckboxListTile(
-          onChanged: (bool? value) {
-            setBoolPreference('forget-me-not', value);
-            if (value ?? false) {
+          onChanged: (bool value) {
+            setState(() {
+              _forgetMeNot = value;
+            });
+
+            setBoolPreference('forget-me-not', _forgetMeNot);
+            if (_forgetMeNot) {
               setIntPreference('scroll-value', widget.scrollValue);
             } else {
               removePreference('scroll-value');
@@ -212,8 +216,11 @@ class _PreferencesState extends State<Preferences> {
           subtitle: const Text('Some numbers are worth remembering.'),
         ),
         CustomCheckboxListTile(
-          onChanged: (bool? value) {
-            setBoolPreference('short-on-time', value);
+          onChanged: (bool value) {
+            setState(() {
+              _shortOnTime = value;
+            });
+            setBoolPreference('short-on-time', _shortOnTime);
           },
           value: _shortOnTime,
           title: const Text('Short on time'),
@@ -232,13 +239,12 @@ class _PreferencesState extends State<Preferences> {
         ),
         CustomRangeListTile(
           onChanged: (int value) {
-            // do not update count in shared preferences until you create a new counter
-            Provider.of<SettingsChangeNotifier>(context, listen: false)
-                .setCount(value);
-
             setState(() {
               _count = value;
             });
+
+            Provider.of<SettingsChangeNotifier>(context, listen: false)
+                .setCount(_count);
           },
           min: 1,
           max: 5,
