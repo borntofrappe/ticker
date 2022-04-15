@@ -46,7 +46,9 @@ class Settings extends StatelessWidget {
             create: (_) => SettingsChangeNotifier(),
             child: Column(
               children: <Widget>[
-                const Navigation(),
+                Navigation(
+                  previousCount: count,
+                ),
                 const ListTile(
                   title: Text(
                     'Ticker',
@@ -72,7 +74,12 @@ class Settings extends StatelessWidget {
 }
 
 class Navigation extends StatelessWidget {
-  const Navigation({Key? key}) : super(key: key);
+  final int previousCount;
+
+  const Navigation({
+    Key? key,
+    this.previousCount = 3,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -115,7 +122,7 @@ class Navigation extends StatelessWidget {
             (Route<dynamic> route) => false,
             arguments: ScreenArguments(
               scrollValue: 0,
-              count: count ?? 3, // should be widget's count
+              count: count ?? previousCount,
             ),
           );
         },
