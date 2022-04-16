@@ -2,6 +2,10 @@
 
 A trivial counter app.
 
+- gesture detector
+
+- splash of color
+
 ## demos
 
 ### wheel
@@ -87,6 +91,20 @@ In the settings page the checkbox is actually slotted in a list tile. The demo s
 ### custom_range_list_tile
 
 In the settings page one of the options allows to change the number of column by tapping on a counter button. The demo shows how to fit the custom button in a `ListTile` widget and update the child to show the desired number.
+
+### wheel_redesign
+
+With the development of the application the wheel is updated with a different widget tree to guarantee the following design:
+
+- a solid background for the center item
+
+- the list wheel widget with the multiple items
+
+- an interactable container with a border for the center item
+
+Instead of repeating `ListWheelScroll` widgets, knowing the size of the center item as per the `itemExtent` property, the containers are of known sizes. Furthermore, the interactivity desired for the topmost layer cannot be implemented by wrapping the items of a `ListWheelScroll` widget with `GestureDetector`, as the list widget seems to override the associated features.
+
+Creating separate components for the decorations, the background and the border, also allows the individual `Item` widget to be simplified considerably. The only purpose of `Item` is to render the input child widget in a squared, fitted box.
 
 ## App
 
