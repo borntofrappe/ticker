@@ -3,6 +3,8 @@ import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:ticker/widgets/custom_button.dart';
+import 'package:ticker/widgets/square_fitted_box.dart';
+import 'package:ticker/widgets/box_decorations.dart';
 
 import 'package:ticker/helpers/screen_arguments.dart';
 
@@ -316,30 +318,12 @@ class Wheel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    double borderWidth = itemExtent / 20;
-    double borderRadius = itemExtent / 6;
-
     return Center(
       child: Stack(
+        alignment: AlignmentDirectional.center,
         children: [
-          ExcludeSemantics(
-            child: ListWheelScrollView(
-              physics: const NeverScrollableScrollPhysics(),
-              itemExtent: itemExtent,
-              children: <Widget>[
-                AspectRatio(
-                  aspectRatio: 1.0,
-                  child: Container(
-                    decoration: BoxDecoration(
-                      color: Theme.of(context).colorScheme.background,
-                      borderRadius: BorderRadius.all(
-                        Radius.circular(borderRadius),
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            ),
+          RoundedBackground(
+            size: itemExtent,
           ),
           ListWheelScrollView(
             overAndUnderCenterOpacity: 0,
@@ -349,59 +333,21 @@ class Wheel extends StatelessWidget {
             children: List<Widget>.generate(
               _digits +
                   1, // there's one more item than there are digits to fabricate the closed wheel
-              (index) => Item(
-                digit: index % _digits,
+              (index) => SquareFittedBox(
+                child: Text(
+                  '${index % _digits}',
+                  style: TextStyle(
+                    color: Theme.of(context).colorScheme.primary,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
               ),
             ).reversed.toList(),
           ),
-          ExcludeSemantics(
-            child: ListWheelScrollView(
-              physics: const NeverScrollableScrollPhysics(),
-              itemExtent: itemExtent,
-              children: <Widget>[
-                AspectRatio(
-                  aspectRatio: 1.0,
-                  child: Container(
-                    decoration: BoxDecoration(
-                      border: Border.all(
-                        color: Theme.of(context).colorScheme.primary,
-                        width: borderWidth,
-                      ),
-                      borderRadius: BorderRadius.all(
-                        Radius.circular(borderRadius),
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            ),
+          RoundedBorder(
+            size: itemExtent,
           ),
         ],
-      ),
-    );
-  }
-}
-
-class Item extends StatelessWidget {
-  final int digit;
-
-  const Item({
-    Key? key,
-    required this.digit,
-  }) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return AspectRatio(
-      aspectRatio: 1,
-      child: FittedBox(
-        child: Text(
-          '$digit',
-          style: TextStyle(
-            color: Theme.of(context).colorScheme.primary,
-            fontWeight: FontWeight.w700,
-          ),
-        ),
       ),
     );
   }

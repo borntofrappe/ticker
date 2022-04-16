@@ -3,6 +3,9 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:ticker/helpers/screen_arguments.dart';
 
+import 'package:ticker/widgets/square_fitted_box.dart';
+import 'package:ticker/widgets/box_decorations.dart';
+
 class SplashScreen extends StatefulWidget {
   final String text;
   const SplashScreen({
@@ -89,31 +92,14 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   Widget build(BuildContext context) {
     const double itemExtent = 200.0;
-    const double borderWidth = itemExtent / 20;
-    const double borderRadius = itemExtent / 6;
 
     return Scaffold(
       body: Center(
         child: Stack(
+          alignment: AlignmentDirectional.center,
           children: [
-            ExcludeSemantics(
-              child: ListWheelScrollView(
-                physics: const NeverScrollableScrollPhysics(),
-                itemExtent: itemExtent,
-                children: <Widget>[
-                  AspectRatio(
-                    aspectRatio: 1.0,
-                    child: Container(
-                      decoration: BoxDecoration(
-                        color: Theme.of(context).colorScheme.background,
-                        borderRadius: const BorderRadius.all(
-                          Radius.circular(borderRadius),
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
+            const RoundedBackground(
+              size: itemExtent,
             ),
             RotatedBox(
               quarterTurns: -1,
@@ -127,50 +113,27 @@ class _SplashScreenState extends State<SplashScreen> {
                   builder: (BuildContext context, int index) {
                     return RotatedBox(
                       quarterTurns: 1,
-                      child: AspectRatio(
-                        aspectRatio: 1.0,
-                        child: FittedBox(
-                          child: index == 0
-                              ? Icon(
-                                  Icons.chevron_right_rounded,
+                      child: SquareFittedBox(
+                        child: index == 0
+                            ? Icon(
+                                Icons.chevron_right_rounded,
+                                color: Theme.of(context).colorScheme.primary,
+                              )
+                            : Text(
+                                widget.text[index - 1],
+                                style: TextStyle(
                                   color: Theme.of(context).colorScheme.primary,
-                                )
-                              : Text(
-                                  widget.text[index - 1],
-                                  style: TextStyle(
-                                    color:
-                                        Theme.of(context).colorScheme.primary,
-                                    fontWeight: FontWeight.w700,
-                                  ),
+                                  fontWeight: FontWeight.w700,
                                 ),
-                        ),
+                              ),
                       ),
                     );
                   },
                 ),
               ),
             ),
-            ExcludeSemantics(
-              child: ListWheelScrollView(
-                physics: const NeverScrollableScrollPhysics(),
-                itemExtent: itemExtent,
-                children: <Widget>[
-                  AspectRatio(
-                    aspectRatio: 1.0,
-                    child: Container(
-                      decoration: BoxDecoration(
-                        border: Border.all(
-                          color: Theme.of(context).colorScheme.primary,
-                          width: borderWidth,
-                        ),
-                        borderRadius: const BorderRadius.all(
-                          Radius.circular(borderRadius),
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
+            const RoundedBorder(
+              size: itemExtent,
             ),
           ],
         ),
