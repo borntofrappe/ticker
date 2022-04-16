@@ -12,6 +12,7 @@ import 'dart:math';
 import 'dart:ui';
 
 const int _digits = 10;
+const double _borderRadiusRatio = 1 / 6;
 
 class HomeChangeNotifier extends ChangeNotifier {
   bool _forgetMeNot = false;
@@ -64,6 +65,35 @@ class HomeChangeNotifier extends ChangeNotifier {
     } while (index > 0 &&
         ((direction == 1 && _controllers[index].selectedItem % _digits == 0) ||
             (direction == -1 && _controllers[index].selectedItem == 1)));
+
+    if (_forgetMeNot) {
+      Future.delayed(
+        Duration(milliseconds: saveScrollValueDelay),
+        () {
+          saveScrollValue();
+        },
+      );
+    }
+  }
+
+  void scrollWheel(int index, [int direction = -1]) {
+    int scrollDuration = 150;
+    int saveScrollValueDelay = scrollDuration;
+
+    FixedExtentScrollController controller = _controllers[index];
+    int selectedItem = controller.selectedItem;
+
+    if (direction == -1 && selectedItem == 0) {
+      controller.jumpToItem(_digits);
+    } else if (direction == 1 && selectedItem == _digits) {
+      controller.jumpToItem(0);
+    }
+
+    controller.animateToItem(
+      controller.selectedItem + 1 * direction,
+      duration: Duration(milliseconds: scrollDuration),
+      curve: Curves.easeInOutQuad,
+    );
 
     if (_forgetMeNot) {
       Future.delayed(
@@ -293,6 +323,7 @@ class _WheelsState extends State<Wheels> {
                         child: Wheel(
                           controller: controller,
                           itemExtent: itemExtent,
+                          index: _controllers.indexOf(controller),
                         ),
                       ),
                     ),
@@ -309,11 +340,13 @@ class _WheelsState extends State<Wheels> {
 class Wheel extends StatelessWidget {
   final FixedExtentScrollController controller;
   final double itemExtent;
+  final int index;
 
   const Wheel({
     Key? key,
     required this.controller,
     required this.itemExtent,
+    required this.index,
   }) : super(key: key);
 
   @override
@@ -344,8 +377,27 @@ class Wheel extends StatelessWidget {
               ),
             ).reversed.toList(),
           ),
-          RoundedBorder(
-            size: itemExtent,
+          ClipRRect(
+            borderRadius: BorderRadius.all(
+              Radius.circular(itemExtent *
+                  _borderRadiusRatio), // do not know the reason but the border radius tends to be smaller than that of the container
+            ),
+            child: Material(
+              color: Colors.transparent,
+              child: InkWell(
+                highlightColor: Colors.transparent,
+                splashColor: Theme.of(context).colorScheme.shadow,
+                onTap: () {
+                  Provider.of<HomeChangeNotifier>(context, listen: false)
+                      .scrollWheel(index);
+                },
+                child: Ink(
+                  child: RoundedBorder(
+                    size: itemExtent,
+                  ),
+                ),
+              ),
+            ),
           ),
         ],
       ),
