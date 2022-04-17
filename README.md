@@ -24,7 +24,7 @@ Wrap this last widget in `ExcludeSemantics` given the purely decorative reasonin
 
 _Please note:_ in the demo the wheel for the border precedes the one dedicated to the numbers, to preserve the scrolling. This means the border is actually behind the digits. In the moment you disable physics scrolling and manage the wheel with a controller it is reasonable to swap the two widgets.
 
-### change_notifier
+### wheel_change_notifier
 
 As prefaced in the demo devoted to a single wheel the goal is to update the wheels with two separate buttons. It is possible to create a single giant widget which renders the wheel _and_ button in the same `build` method, managing the logic for both, but it is ultimately helpful to break the application into multiple widgets. In this instance the change notifier helps to update the interface from the separate location.
 
@@ -90,7 +90,59 @@ In the settings page one of the options allows to change the number of column by
 
 ### custom_range_list
 
-Upon revisiting the custom_range_list demo I realized the solution could be expanded to a more general widget which receives a list of widgets and iterates through them as the button is pressed. With this design it is possible to iterate through numbers, rendered through text widgets, or again through colors, rendered through empty containers. Having access to the index is enough to reference the original value and update the UI accordingly.
+Upon revisiting the [custom_range_list_tile](#customcheckboxlisttile) demo I realized the solution could be expanded to a more general widget which receives a list of widgets and iterates through them as the button is pressed. With this design it is possible to iterate through numbers, rendered through text widgets, or again through colors, rendered through empty containers. Having access to the index is enough to reference the original value and update the UI accordingly.
+
+### theme_change_notifier
+
+The goal is to slightly tweak the appearance of the application with a touch of color.
+
+Start with a map describing color values for a light color scheme.
+
+```dart
+const List<Map<String, Color>> _colors = [
+  {
+    'primary': Colors.black87,
+    'secondary': Colors.black87,
+  //...
+```
+
+Create a change notifier which keeps track of the current theme with a counter variable.
+
+```dart
+class ThemeDataChangeNotifier extends ChangeNotifier {
+  int _index = 0;
+}
+```
+
+Create a function which returns a theme data with the colors from one of the maps.
+
+```dart
+ThemeData getThemeData() {
+  Map colors = _colors[_index];
+
+  return ThemeData(
+    scaffoldBackgroundColor: colors['scaffoldBackgroundColor'],
+  //...
+```
+
+Create a function which updates the index and then the benefiting widgets by calling `notifyListeners`.
+
+```dart
+void nextTheme() {
+  _index = (_index + 1) % _colors.length;
+  notifyListeners();
+}
+```
+
+With this setup include the theme in the instance of the material app.
+
+```dart
+return MaterialApp(
+  theme: Provider.of<ThemeDataChangeNotifier>(context).getThemeData(),
+  // ...
+```
+
+_Please note:_ The demo potentially invalidates [custom_range_list](#customrangelist). The reason for this is that you can rely on a simple button which uses the colors in the child widget.
 
 ### wheel_redesign
 
