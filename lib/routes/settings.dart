@@ -8,6 +8,8 @@ import 'package:ticker/widgets/custom_range_list_tile.dart';
 
 import 'package:ticker/helpers/screen_arguments.dart';
 
+import 'package:ticker/helpers/theme_data_change_notifier.dart';
+
 class SettingsChangeNotifier extends ChangeNotifier {
   int? _count;
 
@@ -53,6 +55,10 @@ class Settings extends StatelessWidget {
                   title: Text(
                     'Ticker',
                     style: Theme.of(context).textTheme.headline1,
+                  ),
+                  subtitle: Text(
+                    'A trivial counter app.',
+                    style: Theme.of(context).textTheme.headline4,
                   ),
                 ),
                 Expanded(
@@ -247,6 +253,36 @@ class _PreferencesState extends State<Preferences> {
           ),
           checkboxSize: widgetSize,
           iconSize: iconSize,
+        ),
+        ListTile(
+          onTap: () {
+            Provider.of<ThemeDataChangeNotifier>(context, listen: false)
+                .nextTheme();
+          },
+          title: Text(
+            'Color splash',
+            style: Theme.of(context).textTheme.headline3,
+          ),
+          subtitle: Text(
+            'A bit of flair to brighten up the day.',
+            style: Theme.of(context).textTheme.headline4,
+          ),
+          trailing: CustomButton(
+            onPressed: () {
+              Provider.of<ThemeDataChangeNotifier>(context, listen: false)
+                  .nextTheme();
+            },
+            child: Padding(
+              padding: EdgeInsets.all(widgetSize / 1.5),
+              child: Container(
+                width: widgetSize,
+                height: widgetSize,
+                color: Theme.of(context).colorScheme.primary,
+              ),
+            ),
+            size: widgetSize,
+            showOverlay: false,
+          ),
         ),
         const SizedBox(height: 16.0),
         ListTile(

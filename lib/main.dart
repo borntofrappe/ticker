@@ -7,8 +7,16 @@ import 'package:ticker/routes/settings.dart';
 import 'package:ticker/helpers/slide_to_route.dart';
 import 'package:ticker/helpers/screen_arguments.dart';
 
+import 'package:ticker/helpers/theme_data_change_notifier.dart';
+import 'package:provider/provider.dart';
+
 void main() {
-  runApp(const App());
+  runApp(
+    ChangeNotifierProvider(
+      create: (_) => ThemeDataChangeNotifier(),
+      child: const App(),
+    ),
+  );
 }
 
 class App extends StatelessWidget {
@@ -17,25 +25,7 @@ class App extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      theme: ThemeData(
-        scaffoldBackgroundColor: Colors.white,
-        colorScheme: const ColorScheme.light().copyWith(
-          primary: Colors.black87,
-          background: Colors.white,
-          shadow: Colors.black12,
-        ),
-        textTheme: const TextTheme(
-          headline1: TextStyle(fontSize: 24.0, color: Colors.black87),
-          headline2: TextStyle(fontSize: 14.0, color: Colors.black54),
-          headline3: TextStyle(
-            fontSize: 14.0,
-            color: Colors.black87,
-            fontWeight: FontWeight.w700,
-          ),
-          headline4: TextStyle(fontSize: 14.0, color: Colors.black54),
-        ),
-        fontFamily: 'Inter',
-      ),
+      theme: Provider.of<ThemeDataChangeNotifier>(context).getThemeData(),
       home: const SplashScreen(
         text: 'Ticker',
       ),
