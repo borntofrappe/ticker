@@ -2,10 +2,6 @@
 
 A trivial counter app.
 
-- gesture detector
-
-- splash of color
-
 ## demos
 
 ### wheel
@@ -91,6 +87,10 @@ In the settings page the checkbox is actually slotted in a list tile. The demo s
 ### custom_range_list_tile
 
 In the settings page one of the options allows to change the number of column by tapping on a counter button. The demo shows how to fit the custom button in a `ListTile` widget and update the child to show the desired number.
+
+### custom_range_list
+
+Upon revisiting the custom_range_list demo I realized the solution could be expanded to a more general widget which receives a list of widgets and iterates through them as the button is pressed. With this design it is possible to iterate through numbers, rendered through text widgets, or again through colors, rendered through empty containers. Having access to the index is enough to reference the original value and update the UI accordingly.
 
 ### wheel_redesign
 
