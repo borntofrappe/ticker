@@ -357,28 +357,6 @@ class Wheel extends StatelessWidget {
       child: Stack(
         alignment: AlignmentDirectional.center,
         children: [
-          RoundedBackground(
-            size: itemExtent,
-          ),
-          ListWheelScrollView(
-            overAndUnderCenterOpacity: 0,
-            physics: const NeverScrollableScrollPhysics(),
-            controller: controller,
-            itemExtent: itemExtent,
-            children: List<Widget>.generate(
-              _digits +
-                  1, // there's one more item than there are digits to fabricate the closed wheel
-              (index) => SquareFittedBox(
-                child: Text(
-                  '${index % _digits}',
-                  style: TextStyle(
-                    color: Theme.of(context).colorScheme.primary,
-                    fontWeight: FontWeight.w700,
-                  ),
-                ),
-              ),
-            ).reversed.toList(),
-          ),
           ClipRRect(
             borderRadius: BorderRadius.all(
               Radius.circular(itemExtent *
@@ -394,11 +372,40 @@ class Wheel extends StatelessWidget {
                       .scrollWheel(index);
                 },
                 child: Ink(
-                  child: RoundedBorder(
+                  child: RoundedBackground(
                     size: itemExtent,
+                    color: Colors
+                        .transparent, // a solid color would override the ink effect
                   ),
+                  color: Theme.of(context).colorScheme.background,
                 ),
               ),
+            ),
+          ),
+          IgnorePointer(
+            child: ListWheelScrollView(
+              overAndUnderCenterOpacity: 0,
+              physics: const NeverScrollableScrollPhysics(),
+              controller: controller,
+              itemExtent: itemExtent,
+              children: List<Widget>.generate(
+                _digits +
+                    1, // there's one more item than there are digits to fabricate the closed wheel
+                (index) => SquareFittedBox(
+                  child: Text(
+                    '${index % _digits}',
+                    style: TextStyle(
+                      color: Theme.of(context).colorScheme.primary,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                ),
+              ).reversed.toList(),
+            ),
+          ),
+          IgnorePointer(
+            child: RoundedBorder(
+              size: itemExtent,
             ),
           ),
         ],
