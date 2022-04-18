@@ -5,6 +5,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:ticker/widgets/custom_button.dart';
 import 'package:ticker/widgets/custom_checkbox_list_tile.dart';
 import 'package:ticker/widgets/custom_range_list_tile.dart';
+import 'package:ticker/widgets/box_decorations.dart';
 
 import 'package:ticker/helpers/screen_arguments.dart';
 
@@ -264,7 +265,7 @@ class _PreferencesState extends State<Preferences> {
             style: Theme.of(context).textTheme.headline3,
           ),
           subtitle: Text(
-            'A bit of flair to brighten up the day.',
+            'A drop of paint with a lot of flair.',
             style: Theme.of(context).textTheme.headline4,
           ),
           trailing: CustomButton(
@@ -273,10 +274,9 @@ class _PreferencesState extends State<Preferences> {
                   .nextTheme();
             },
             child: Padding(
-              padding: EdgeInsets.all(widgetSize / 1.5),
-              child: Container(
-                width: widgetSize,
-                height: widgetSize,
+              padding: EdgeInsets.all(widgetSize / 2),
+              child: RoundedBackground(
+                size: widgetSize,
                 color: Theme.of(context).colorScheme.primary,
               ),
             ),

@@ -1,15 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:provider/provider.dart';
 
 import 'package:ticker/helpers/screen_arguments.dart';
 
 import 'package:ticker/widgets/square_fitted_box.dart';
 import 'package:ticker/widgets/box_decorations.dart';
 
+import 'package:ticker/helpers/theme_data_change_notifier.dart';
+
 class SplashScreen extends StatefulWidget {
   final String text;
+  final BuildContext context;
+
   const SplashScreen({
     required this.text,
+    required this.context,
     Key? key,
   }) : super(key: key);
 
@@ -24,6 +30,9 @@ class _SplashScreenState extends State<SplashScreen> {
   late FixedExtentScrollController _controller;
 
   void _goToHomeRoute() async {
+    await Provider.of<ThemeDataChangeNotifier>(widget.context, listen: false)
+        .retrieveIndexTheme();
+
     final preferences = await SharedPreferences.getInstance();
     bool forgetMeNot = preferences.getBool('forget-me-not') ?? false;
 
@@ -94,12 +103,14 @@ class _SplashScreenState extends State<SplashScreen> {
     const double itemExtent = 200.0;
 
     return Scaffold(
+      backgroundColor: Colors.white,
       body: Center(
         child: Stack(
           alignment: AlignmentDirectional.center,
           children: [
             const RoundedBackground(
               size: itemExtent,
+              color: Colors.white,
             ),
             RotatedBox(
               quarterTurns: -1,
@@ -115,14 +126,14 @@ class _SplashScreenState extends State<SplashScreen> {
                       quarterTurns: 1,
                       child: SquareFittedBox(
                         child: index == 0
-                            ? Icon(
+                            ? const Icon(
                                 Icons.chevron_right_rounded,
-                                color: Theme.of(context).colorScheme.primary,
+                                color: Colors.black87,
                               )
                             : Text(
                                 widget.text[index - 1],
-                                style: TextStyle(
-                                  color: Theme.of(context).colorScheme.primary,
+                                style: const TextStyle(
+                                  color: Colors.black87,
                                   fontWeight: FontWeight.w700,
                                 ),
                               ),
@@ -134,6 +145,7 @@ class _SplashScreenState extends State<SplashScreen> {
             ),
             const RoundedBorder(
               size: itemExtent,
+              color: Colors.black87,
             ),
           ],
         ),

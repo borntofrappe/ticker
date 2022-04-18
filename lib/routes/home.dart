@@ -236,18 +236,20 @@ class _WheelsState extends State<Wheels> {
       (_) => FixedExtentScrollController(),
     );
 
-    int scrollValue = widget.scrollValue;
+    WidgetsBinding.instance?.addPostFrameCallback((_) {
+      int scrollValue = widget.scrollValue;
 
-    if (scrollValue > 0) {
-      const int scrollDelay = 750;
+      if (scrollValue > 0) {
+        const int scrollDelay = 750;
 
-      Future.delayed(
-        const Duration(milliseconds: scrollDelay),
-        () {
-          _scrollTo(scrollValue);
-        },
-      );
-    }
+        Future.delayed(
+          const Duration(milliseconds: scrollDelay),
+          () {
+            _scrollTo(scrollValue);
+          },
+        );
+      }
+    });
   }
 
   @override

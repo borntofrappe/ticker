@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 const List<Map<String, Color>> _colors = [
   {
@@ -10,35 +11,35 @@ const List<Map<String, Color>> _colors = [
     'scaffoldBackgroundColor': Colors.white,
   },
   {
-    'primary': Color(0xFFFF7088),
-    'secondary': Color(0xFF181515),
-    'tertiary': Color(0xFF2C2325),
-    'background': Color(0xFFFFE0E4),
-    'shadow': Color(0xFFFFACAC),
-    'scaffoldBackgroundColor': Color(0xFFFFF7F8),
+    'primary': Color(0xFFF84E6A),
+    'secondary': Color(0xFF443434),
+    'tertiary': Color(0xFF382126),
+    'background': Color(0xFFFFE6E9),
+    'shadow': Color(0xFFFFBCBC),
+    'scaffoldBackgroundColor': Color(0xFFFFECEF),
   },
   {
-    'primary': Color(0xFFF6F352),
-    'secondary': Color(0xDD252323),
-    'tertiary': Color(0x87222220),
-    'background': Color(0xFFFFFEEC),
-    'shadow': Color(0xFFFFF891),
-    'scaffoldBackgroundColor': Color(0xFFFFFFEA),
+    'primary': Color(0xFFECE251),
+    'secondary': Color(0xDD3A3131),
+    'tertiary': Color(0x8533332D),
+    'background': Color(0xFFFFFEE8),
+    'shadow': Color(0xFFFFFBC5),
+    'scaffoldBackgroundColor': Color(0xFFFFFFF0),
   },
   {
-    'primary': Color(0xFF39bEFF),
-    'secondary': Color(0xFF212425),
-    'tertiary': Color(0xFF353E42),
+    'primary': Color(0xFF36BBFD),
+    'secondary': Color(0xFF262D30),
+    'tertiary': Color(0xFF273F49),
     'background': Color(0xFFE7F7FF),
-    'shadow': Color(0xFFB5E6FF),
-    'scaffoldBackgroundColor': Color(0xFFF3FBFF),
+    'shadow': Color(0xFFCCEDFD),
+    'scaffoldBackgroundColor': Color(0xFFE7F7FF),
   },
   {
-    'primary': Color(0xFFFFA1DD),
-    'secondary': Color(0xFF30222B),
-    'tertiary': Color(0xFF493542),
-    'background': Color.fromARGB(255, 255, 224, 243),
-    'shadow': Color(0xFFFFDFF3),
+    'primary': Color(0xFFFA94D4),
+    'secondary': Color(0xFF573E4E),
+    'tertiary': Color(0xFF502A43),
+    'background': Color(0xFFFFE5F5),
+    'shadow': Color(0xFFFFCEEE),
     'scaffoldBackgroundColor': Color(0xFFFFF0F9),
   },
 ];
@@ -74,6 +75,18 @@ class ThemeDataChangeNotifier extends ChangeNotifier {
 
   void nextTheme() {
     _index = (_index + 1) % _colors.length;
+    _saveIndexTheme();
     notifyListeners();
+  }
+
+  Future<void> retrieveIndexTheme() async {
+    final preferences = await SharedPreferences.getInstance();
+    _index = preferences.getInt('index-theme') ?? 0;
+    notifyListeners();
+  }
+
+  void _saveIndexTheme() async {
+    final preferences = await SharedPreferences.getInstance();
+    preferences.setInt('index-theme', _index);
   }
 }

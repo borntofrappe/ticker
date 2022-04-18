@@ -26,8 +26,9 @@ class App extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       theme: Provider.of<ThemeDataChangeNotifier>(context).getThemeData(),
-      home: const SplashScreen(
+      home: SplashScreen(
         text: 'Ticker',
+        context: context,
       ),
       onGenerateRoute: (RouteSettings settings) {
         if (settings.name == '/home') {
