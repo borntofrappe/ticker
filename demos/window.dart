@@ -42,15 +42,13 @@ class Wheel extends StatelessWidget {
     return Center(
       child: Stack(
         children: [
-          ExcludeSemantics(
-            child: ListWheelScrollView(
-              itemExtent: itemExtent,
-              children: const <Widget>[
-                Item(
-                  borderWidth: 8.0,
-                ),
-              ],
-            ),
+          ListWheelScrollView(
+            itemExtent: itemExtent,
+            children: const <Widget>[
+              Item(
+                borderWidth: 8.0,
+              ),
+            ],
           ),
           ListWheelScrollView(
             overAndUnderCenterOpacity: 0,

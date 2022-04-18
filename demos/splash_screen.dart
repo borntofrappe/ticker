@@ -13,7 +13,7 @@ class App extends StatelessWidget {
       theme: ThemeData(
         primaryColor: Colors.black87,
       ),
-      home: const SplashScreen(text: 'ticker'),
+      home: const SplashScreen(text: 'Ticker'),
     );
   }
 }
@@ -68,6 +68,7 @@ class _SplashScreenState extends State<SplashScreen> {
     return Scaffold(
       body: Center(
         child: Stack(
+          alignment: AlignmentDirectional.center,
           children: [
             RotatedBox(
               quarterTurns: -1,
@@ -84,7 +85,9 @@ class _SplashScreenState extends State<SplashScreen> {
                       child: AspectRatio(
                         aspectRatio: 1.0,
                         child: FittedBox(
-                          child: Text(widget.text[index]),
+                          child: Text(
+                            widget.text[index],
+                          ),
                         ),
                       ),
                     );
@@ -92,24 +95,15 @@ class _SplashScreenState extends State<SplashScreen> {
                 ),
               ),
             ),
-            ExcludeSemantics(
-              child: ListWheelScrollView(
-                physics: const NeverScrollableScrollPhysics(),
-                itemExtent: _itemExtent,
-                children: <Widget>[
-                  AspectRatio(
-                    aspectRatio: 1.0,
-                    child: Container(
-                      decoration: BoxDecoration(
-                        border: Border.all(
-                          width: 8.0,
-                          color: Theme.of(context).primaryColor,
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
+            Container(
+              decoration: BoxDecoration(
+                border: Border.all(
+                  width: 8.0,
+                  color: Theme.of(context).primaryColor,
+                ),
               ),
+              width: _itemExtent,
+              height: _itemExtent,
             ),
           ],
         ),

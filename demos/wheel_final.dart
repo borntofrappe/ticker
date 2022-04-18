@@ -72,28 +72,17 @@ class Wheel extends StatelessWidget {
               ),
             ),
           ),
-          ClipRRect(
-            borderRadius: borderRadius,
-            child: Material(
-              color: Colors.transparent,
-              child: InkWell(
-                onTap: () {
-                  // handle tap
-                },
-                child: Ink(
-                  decoration: BoxDecoration(
-                    border: Border.all(
-                      width: borderWidth,
-                      color: Theme.of(context).primaryColor,
-                    ),
-                    borderRadius: borderRadius,
-                  ),
-                  width: itemExtent,
-                  height: itemExtent,
-                ),
+          Container(
+            decoration: BoxDecoration(
+              border: Border.all(
+                width: borderWidth,
+                color: Theme.of(context).primaryColor,
               ),
+              borderRadius: borderRadius,
             ),
-          )
+            width: itemExtent,
+            height: itemExtent,
+          ),
         ],
       ),
     );

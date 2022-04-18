@@ -2,47 +2,87 @@
 
 A trivial counter app.
 
-## demos
+## Feature
+
+Press one of two buttons to update a counter in the [0-999] range.
+
+## App preferences
+
+- save the counter as the app is terminated
+
+- reduce the duration of the initial animation
+
+- add color from a few options
+
+## Counter preferences
+
+Change the number of columns and the counter's range.
+
+## Development
+
+> for posterity's sake
+
+This project has been developed starting from the static assets in the `res` folder, with the contribution of small, independent projects in the `demo` sub-directory.
 
 ### wheel
 
-As the user presses the buttons in the bottom section of the home screen the goal is to have numbers scroll vertically to update the current count. In the application I intend to implement the scrolling feature with a `ListWheelScrollView` and a dedicated controller, but the demo works to show how the widget and its two required properties operate. `itemExtent` explains the height devoted to the individual items, `children` provides the list of widgets to show one above the other.
+> display numbers in the 0-9 range one above the other
 
-In terms of appearance show the individual items in a squared container — through `AspectRatio`, and with a solid border — although ultimately the border is meant to highlight only the center value.
+Use `ListWheelScrollView` specifying the two required properties:
+
+1. `itemExtent` , the height devoted to the individual items
+
+2. `children`, the list of widgets to show one above the other
+
+For the individual item show the numbers in a squared container — through `AspectRatio`, and with a solid border — although ultimately the border is meant to highlight only the center value.
 
 ### wheels
 
-To consider numbers beyond the unit column add multiple wheels side by side. The demo highlights an issue with the choice of using a hard-coded value for the `itemExtent` property: in the moment the screen's width is not able to fit all the squared containers the aspect ratio is compromised to have the height of the items preserved.
+> display multiple wheels side by side
 
-One way to fix this issue is with `LayoutBuilder`. The widget provides box constraints and most importantly the maximum width and height. Use the minimum between the two together with a hard-coded default value to compute the item extent.
+In the moment the screen's width is not able to fit all the squared containers the aspect ratio is compromised to have the height of the items preserved.
+
+Use `LayoutBuilder` to retrieve box constraints and most importantly the maximum width and height. Use the minimum between the two together with a hard-coded default value to compute the item extent.
 
 ### window
 
-As prefaced in the demo devoted to a single wheel the goal is to show a solid border only around the center item. One solution is to have a `Stack` widget with two overlapping wheels. In one wheel add the digits, in the other wheel add a single item to create the outline.
+> only show the center item in a frame
 
-Wrap this last widget in `ExcludeSemantics` given the purely decorative reasoning behind the component.
+Use a `Stack` widget with two overlapping wheels. In one wheel add the digits, in the other wheel add a single item to create the outline.
 
 _Please note:_ in the demo the wheel for the border precedes the one dedicated to the numbers, to preserve the scrolling. This means the border is actually behind the digits. In the moment you disable physics scrolling and manage the wheel with a controller it is reasonable to swap the two widgets.
 
+_Please also note:_ in the final application the layout was updated to use the list wheel widget only for the numbers. Knowing the size of the items, through `itemExtent`, it is enough to use a `Container` with a fixed size.
+
 ### wheel_change_notifier
 
-As prefaced in the demo devoted to a single wheel the goal is to update the wheels with two separate buttons. It is possible to create a single giant widget which renders the wheel _and_ button in the same `build` method, managing the logic for both, but it is ultimately helpful to break the application into multiple widgets. In this instance the change notifier helps to update the interface from the separate location.
+> manually update the wheel
 
-### infinite_wheel
+It is possible to create a single giant widget which renders the wheel _and_ button in the same `build` method, managing the logic for both. Ultimately, however, I chose to break the application into multiple widgets.
 
-The wheels are ultimately managed with a controller. The demo shows how to implement the wheel always showing numbers in a given range — 0 to 9 — in two possible ways:
+Use an instance of change notifier to update the interface from the separate location.
+
+### wheel_closed
+
+> create a closed wheel looping numbers in the 0-9 range
+
+Create a closed wheel in one of two ways:
 
 1. with a looping wheel relying on the `ListWheelChildLoopingListDelegate` widget
 
-2. with a regular wheel with one more item than necessary. Since the application is managed with a controller the idea is to immediately jump to either end of the list before animation.
+2. with a regular wheel with one more item than necessary. Since the application is ultimately managed with a controller, then, immediately jump to either end of the list before updating the wheel
 
 I ultimately prefer the second option since the index in the scrolling widget is then limited to a given range. In the first instance the index might become exceedingly small or large as the wheel continues producing items in a given direction.
 
-With this in mind the application is meant to show higher numbers above lower values. One way to achieve the desired layout is by:
+### wheel_reversed
 
-1. reversing the list describing the digits
+> show larger numbers above smaller ones
 
-2. swapping the direction for the controller
+From the regular wheel:
+
+1. reverse the list describing the digits
+
+2. swap the direction in the controller
 
 The added difficulty comes in the form of the index referring to the selected item. As the wheel moves upwards, toward greater values as it were, the index becomes smaller.
 
@@ -52,153 +92,81 @@ Display the selected item to debug the interfance.
 print(_controller.selectedItem);
 ```
 
+### wheel_final
+
+> update the design of the closed, reversed wheel
+
+Knowing the `itemExtent` create a layered structure to guarantee a solid background and a border but only for the item in the center of the wheel.
+
+Creating separate components for the decorations, the background and the border, also allows the individual `Item` widget to be simplified considerably. The only purpose of `Item` is to render the input child widget in a squared, fitted box.
+
 ### splash_screen
 
-As a form of splash screen the goal is to show the name of the application with a similar design as the one implemented for the digits.
+> introduce the application with a small animation
 
-Instead of moving the letters top to bottom, however, the idea is to have the animation side to side. This helps to perceive the letters and mirrors how the application will then move to the settings page — refer to the `slideToRoute` demo.
+Show the name of the application with a similar design as the one implemented for the wheel.
 
-For the horizontal wheel rotate the entire list a quarter turn back, the list items a quarter turn forward to keep them straight up.
+Animate the letters side to side. This helps to perceive the letters and better fits how the application will then move between routes.
+
+Use `RotatedBox` to rotate the entire wheel, repeat `RotatedBox` to have the letters rightside up.
 
 ### slideToRoute
 
-Past the splash screen the application is meant to have two screens, home page and settings. To move to and from the settings' page the goal is to have the visual slide from the right side, explaining the need for a custom page builder.
+> move between routes sliding pages horizontally
 
-`slideToRoute` returns an instance of `PageRouteBuilder`. Once you have the function define the transition in the `onGenerateRoute` field of the material application and for the prescribed route.
+With `slideToRoute` return an instance of `PageRouteBuilder`. With the function define the transition in the `onGenerateRoute` field of the material application and for the prescribed route.
 
 The builder is used as the application uses `Navigator.pushNamed`.
 
 ### custom_button
 
-The application relies on several buttons to update the counter, move to the settings page and again update the application's preferences. To mirror the design of the wheels' digits the goal is to have squared buttons with a solid border.
+> design a squared button with a solid border
 
-The demo shows how to implement the desired design with an `OutlinedButton` and the `style` property. The widget tree should allow to include an icon or text widget as a child, expanding the size of either visual to the container's size. If you need a smaller visual wrap the `child` in a `Padding` widget.
+The widget tree should allow to include an icon or text widget as a child, expanding the size of either visual to the container's size. If you need a smaller visual wrap the `child` in a `Padding` widget.
 
 _Please note:_ the demo uses the color from the theme for the color of the border, but **not** for the color of the text or icon. The style of these last two elements is outside of the scope of the button.
 
 ### custom_checkbox
 
-In the settings page the application allows to customize preferences with several widgets, among which a checkbox to save the counter locally. The goal of the demo is to show how to use the custom button designed for the application to toggle between the two options. The widget also receives a function which is called with the updated value, so that ultimately the parent widget is able to enact the desired feature.
+> include the custom button in a checkbox-like widget
+
+Pass a function to the widget to call with the updated value, so that ultimately the parent widget is able to implement the connected logic.
 
 ### custom_checkbox_list_tile
 
-In the settings page the checkbox is actually slotted in a list tile. The demo shows how to fit the custom button in a `ListTile` fabricating a similar solution to `CheckboxListTile`. The functionality of the checkbox is associated with a press on the button or a tap on the list tile.
+> include the custom button in a CheckboxListTile-like widget
+
+_Please note:_ the demo is essentially a rewrite of [custom_checkbox](#customcheckbox) so that it is possible to consider a press on the custom button, a tap on the parent `ListTile`.
 
 ### custom_range_list_tile
 
-In the settings page one of the options allows to change the number of column by tapping on a counter button. The demo shows how to fit the custom button in a `ListTile` widget and update the child to show the desired number.
+> repeat the design of the custom checkbox list tile with a button iterating through values
 
 ### custom_range_list
 
-Upon revisiting the [custom_range_list_tile](#customcheckboxlisttile) demo I realized the solution could be expanded to a more general widget which receives a list of widgets and iterates through them as the button is pressed. With this design it is possible to iterate through numbers, rendered through text widgets, or again through colors, rendered through empty containers. Having access to the index is enough to reference the original value and update the UI accordingly.
+> create a button which loops through a list of widgets as the button is pressed
+
+_Please note:_ the demo is essentially a rewrite of [custom_range_list_tile](#customrangelisttile) to produce a widget with a more general purpose.
+
+_Please also note:_ the demo is made less relevant by [theme_change_notifier](#themechangenotifier).
 
 ### theme_change_notifier
 
-The goal is to slightly tweak the appearance of the application with a touch of color.
+> change a few color values at the press of a button
 
-Start with a map describing color values for a light color scheme.
+In the instance of `MaterialApp` change the overall appearance with an instance of `ThemeData`. With an instance of change notifier update the theme as a button is pressed.
 
-```dart
-const List<Map<String, Color>> _colors = [
-  {
-    'primary': Colors.black87,
-    'secondary': Colors.black87,
-  //...
-```
+_Please note:_ as it is possible to show the change in color through the build context it is not necessary to create a custom button to cycle through the color values. This makes the rewrite [custom_range_list](#customrangelist) less relevant.
 
-Create a change notifier which keeps track of the current theme with a counter variable.
+### App specificities
 
-```dart
-class ThemeDataChangeNotifier extends ChangeNotifier {
-  int _index = 0;
-}
-```
+#### Splash screen
 
-Create a function which returns a theme data with the colors from one of the maps.
+For the splash screen use `Navigator.pushReplacementNamed` to remove the widget only after the animation finishes
 
-```dart
-ThemeData getThemeData() {
-  Map colors = _colors[_index];
+#### Font features
 
-  return ThemeData(
-    scaffoldBackgroundColor: colors['scaffoldBackgroundColor'],
-  //...
-```
-
-Create a function which updates the index and then the benefiting widgets by calling `notifyListeners`.
-
-```dart
-void nextTheme() {
-  _index = (_index + 1) % _colors.length;
-  notifyListeners();
-}
-```
-
-With this setup include the theme in the instance of the material app.
-
-```dart
-return MaterialApp(
-  theme: Provider.of<ThemeDataChangeNotifier>(context).getThemeData(),
-  // ...
-```
-
-_Please note:_ The demo potentially invalidates [custom_range_list](#customrangelist). The reason for this is that you can rely on a simple button which uses the colors in the child widget.
-
-### wheel_redesign
-
-With the development of the application the wheel is updated with a different widget tree to guarantee the following design:
-
-- a solid background for the center item
-
-- the list wheel widget with the multiple items
-
-- an interactable container with a border for the center item
-
-Instead of repeating `ListWheelScroll` widgets, knowing the size of the center item as per the `itemExtent` property, the containers are of known sizes. Furthermore, the interactivity desired for the topmost layer cannot be implemented by wrapping the items of a `ListWheelScroll` widget with `GestureDetector`, as the list widget seems to override the associated features.
-
-Creating separate components for the decorations, the background and the border, also allows the individual `Item` widget to be simplified considerably. The only purpose of `Item` is to render the input child widget in a squared, fitted box.
-
-## App
-
-Following the projects in the `demos` folder the application is developed in the `lib` directory. In increments.
-
-### Fonts
-
-In the `fonts` folder add the family chosen for the project. Reference the files in `pubspec.yaml` and the font at app level.
-
-```dart
-return MaterialApp(
-  theme: ThemeData(
-    fontFamily: 'Inter',
-  )
-);
-```
-
-### Splash sreen
-
-Start by adding the splash screen widget in an instance of material app. Define a primary color through `ThemeData` so that the value is picked up by widget.
-
-### Navigation
-
-Add the function producing the sliding animation to move from the splash screen to the home widget.
-
-In splash screen use `Navigator.pushReplacementNamed` to remove the widget only after the animation finishes.
-
-To test the function add also a button to move between the home screen and settings' page. This time use `Navigator.pushNamed` to have the home widget persist below the new route.
-
-_Please note:_ it is likely the flow of the application might change as I further develop the page devoted to the settings.
-
-### Home
-
-Start with the design of the home screen divving up a column in three sections:
-
-1. navigation, with a button to move to the settings' page
-
-2. wheels, with the `ListWheelScrollView` widgets — currently in a fixed number and without the associated controller. The idea is to focus on the appearance only
-
-3. buttons, with the buttons ultimately updating the counter — currently with an empty `onPressed` field
-
-A note on the buttons: import `dart:ui`. The library helps to vertically align the plus and minus sign used in the buttons with the custom font.
+For the home screen import `dart:ui` to vertically align the plus and minus sign used in the buttons with the custom font
 
 ```dart
 fontFeatures: [
@@ -206,7 +174,7 @@ fontFeatures: [
 ],
 ```
 
-### Change notifier
+#### Wheels change notifier
 
 I am positive the approach is flawed, but it works. The challenge with respect to the smaller project in the demos folder is that there are multiple wheels, multiple controllers.
 
@@ -231,7 +199,7 @@ void initialize(List<FixedExtentScrollController> controllers) {
 
 Assigning an empty list first works to remove existing references to controllers, but not controllers. This is because the actual instances are handled in the stateful component making up the wheels.
 
-Wrap the widgets describing the wheels and the buttons in a `ChangeNotifierProvider` so that both components have access to the list.
+Wrap the widgets describing the home screen in `ChangeNotifierProvider` so that all components have access to the list.
 
 ```dart
 child: ChangeNotifierProvider(
@@ -266,15 +234,15 @@ onPressed: () {
 },
 ```
 
-### Scrolling
+#### Scrolling
 
-In the instance of `ChangeNotifier` describe how to update the wheels with a `scroll` method. The functionality is similar to the `infinite_wheel.dart` demo, but is expanded to consider all the existing digits, from the unit to the tens to the hundreds.
+In the instance of `ChangeNotifier` describe how to update the wheels with a `scroll` method. The functionality is similar to the `wheel_infinite.dart` demo, but is expanded to consider all the existing digits, from the unit to the tens to the hundreds.
 
-The idea is to start from the last column, update the item and if the number exceeds the range, in either direction, repeat the process for the preceding set.
+Start from the last column, update the item and if the number exceeds the range, in either direction, repeat the process for the preceding set.
 
-### Initial scroll
+#### Initial scroll
 
-In the moment the application stores the count value locally it is helpful to have the stateful widget update the controllers on the basis of an input variable.
+Update the controllers on the basis of an input variable.
 
 Since the logic relies on the `ListWheelScrollView` widgets actually existing include the instructions in the `initState` lifecycle _and_ a function which runs as the widget is built.
 
@@ -334,37 +302,19 @@ index --;
 
 `~/` works as a shorthand for integer division, `(count / digits).toInt()`.
 
-### Staggered animation
+#### Staggered animation
 
-The goal is to stagger the scrolling animation, both for successive columns and for the initial count.
-
-For either start with a value describing the total duration and compute the number of milliseconds devoted to each digit.
-
-For successive columns devote up to 500 milliseconds, in case every column is updated.
-
-```dart
-int duration = 500 ~/ _controllers.length;
-```
-
-For the initial count devote up to 2 seconds, since it is ultimately possible to scroll to higher digits and the animation introduces the application.
-
-```dart
-int duration = 2000 ~/ _controllers.length;
-```
-
-_Please note:_ the duration and curves might change as I test the application on an actual device.
+Stagger the scrolling animation, both for successive columns and for the initial count.
 
 Initialize a variable to keep track of the delay and increment this number with each column, with each digit.
 
 ```dart
-// successive column
-delay += duration ~/ 3;
+scrollDelay += scrollDurationPerItem ~/ 3;
 
-// initial count
-delay += duration - (duration ~/ 2);
+scrollDelay += scrollDurationPerWheel ~/ 2;
 ```
 
-Consider a smaller amount than the total duration to have successive scrolls take place before the previous instance has had a chance to finish.
+Consider a smaller amount than the total duration to have successive scrolls take place before the previous instance has a chance to finish.
 
 Use `Future.delayed` to animate the controller after the prescribed delay.
 
@@ -392,100 +342,23 @@ controller.animateToItem()
 -_controllers[index].animateToItem()
 ```
 
-### Settings
-
-In terms of design add an icon to move back to the home screen, a list tile with the name of the application and an additional list tile to preface the app prefernces.
-
-Include the app preferences in a `ListView` widget with a series of dedicated components. Since
-
-### Shared preferences
-
-Install the library to manage app preferences and optionally save the counter as the app is terminated and opened anew.
-
-Use the library immediately in the splash screen to optionally reduce the animation.
-
-```dart
-final preferences = await SharedPreferences.getInstance();
-final bool shortOnTime = preferences.getBool('short-on-time') ?? false;
-```
-
-In the settings page update the preferences as the checkbox are toggled.
-
-```dart
-void setBoolPreference(String key, bool? value) async {
-  final preferences = await SharedPreferences.getInstance();
-  preferences.setBool(key, value ?? false);
-}
-```
-
-As the settings page is first created you need to also retrieve the preferences _and_ update the state of the checkboxes. Set the state from the parent widget.
-
-```dart
-void getBoolPreferences() async {
-  final preferences = await SharedPreferences.getInstance();
-  setState(
-    () {
-      _shortOnTime = preferences.getBool('short-on-time') ?? false;
-    },
-  );
-}
-```
-
-Update the state in the child widget through the `didUpdateWidget` lifecycle method.
-
-```dart
-@override
-void didUpdateWidget(oldWidget) {
-  super.didUpdateWidget(oldWidget);
-  setState(() {
-    _value = widget.value;
-  });
-}
-```
-
-### Save scroll value
-
-Storing the value described by the wheels is more complex than toggling a boolean variable to condition the initial animation. This is because it should be possible to save the value both in the home and in the settings page, as the preference is ultimately toggled.
+#### ScreenArguments
 
 Create `ScreenArguments` as a utility class — relevant as you pass arguments between routes.
 
-```dart
-class ScreenArguments {
-  int scrollValue;
-
-  ScreenArguments({
-    required this.scrollValue,
-  });
-}
-```
-
 In the `onGenerateRoute` field of the material app move to the settings page extracting the scroll value from the arguments of the home page.
 
-```dart
-final args = settings.arguments as ScreenArguments;
-return slideToRoute(
-  Settings(
-    scrollValue: args.scrollValue,
-  ),
-);
-```
+#### Shared preferences
 
-Regardless of how the value is computed — refer to a later section — pass the integer from the home page in `Navigator.pushNamed`.
+Use the library immediately in the splash screen to optionally reduce the animation and possibly retrieve the current count. Pass this value to the home route.
 
-```dart
-Navigator.pushNamed(
-  context,
-  '/settings',
-  arguments: ScreenArguments(
-    scrollValue: scrollValue,
-),
-```
+In the settings page update the preferences as the checkbox are toggled, as the buttons are pressed.
 
-In the settings page receive the value in the stateless widget, with the ultimate idea of passing the integer to `Preferences` and save the number in shared preferences if the matching checkbox is toggled.
+#### Save scroll value
 
-In the home page it is then necessary to save the value as the scroll position is changed. The approach might change in the future, but the current idea is to wait for the scroll animation to end and call a function to optionally save the value.
+The settings page receives the scroll value from the home route. Save the integer as the matching matching checkbox is checked.
 
-Mirroring this action, and always in the home screen, it is finally necessary to retrieve the value as the page is first created. Again this action is optional and conditional to the user having selected the desired checkbox.
+In the home page save the value as the scroll position changes. The approach might change in the future, but the current idea is to wait for the scroll animation to end and call a function to optionally save the value.
 
 To compute the scroll value the process is fundamentally the opposite of the one used to set the digits based on the initial count. Start by the last column and increment a counter variable, multiplying the digit by 1, 10, 100 on the basis of the column.
 
@@ -501,12 +374,26 @@ The goal is to then update the value in two instances:
 
 - as the settings screen is popped, since the preference can change with the matching checkbox
 
-For the settings page you also need to handle when the page is removed with the back button. Flutter provides `WillPopScope`. In the `onWillPop` retrieve and return the preference as in the button included in the page.
+For the settings page you also need to handle when the page is removed with the back button. Use `WillPopScope` and return the preference in the `onWillPop` callback.
 
 With the updated value the scrolling function needs to check the boolean instead of always referring to shared preferences.
 
-### Home again
+#### Counter preferences
 
-From the settings page the idea is to create a new counter by pushing the `Home` widget on the settings page and then remove all existing routes. The feat is achieved with `Navigator.pushNamedAndRemoveUntil`, specifically with a predicate function which always returns `false`.
+In the settings page allow to start a new counter by essentially creating a new instance of the home screen. Use `Navigator.pushNamedAndRemoveUntil`, specifically with a predicate function which always returns `false` to add the new route above the settings' page and then remove all previous widgets.
 
-Since the counter is supposed to be new initialize the home screen with a scroll value of zero. Moreover, if the instance of shared preferences describes that the user wants to remember the counter, override the value with the new number.
+#### Theming
+
+Save the index describing the theme through shared preference and directly in the instance of the change notifier/provider.
+
+With the saved value retrieve the index, but only in the splash screen. The idea is to show the default colors up until the application moves to the home screen.
+
+```dart
+void _goToHomeRoute() async {
+  await Provider.of<ThemeDataChangeNotifier>(widget.context, listen: false).retrieveIndexTheme();
+
+  // move to home route
+}
+```
+
+Pass the build context to the splash screen from `main.dart`.
